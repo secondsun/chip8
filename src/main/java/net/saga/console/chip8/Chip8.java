@@ -23,6 +23,8 @@
  */
 package net.saga.console.chip8;
 
+import java.util.Random;
+
 /**
  * This class is the main chip8 system
  */
@@ -31,7 +33,8 @@ public class Chip8 {
     private int pc = 0x200;
     private int i = 0;
     private int[] registers = new int[0x10];
-
+    private final Random random = new Random();
+    
     public int getPC() {
         return pc;
     }
@@ -116,6 +119,12 @@ public class Chip8 {
                 registers[register] += low;
             }
             break;
+            case 0xC: { //7XNN	Mask a random and  number NN to register VX
+                int low = 0x0FF & i;
+                int register = (i & 0x0f00) >> 8;
+                registers[register] = random.nextInt(0xFF) & low;
+            }
+            break;
             case 8: {
                 int low = 0x00F & i;
                 int registerX = (i & 0x0F00) >> 8;
@@ -126,6 +135,19 @@ public class Chip8 {
                         registers[registerX] = registers[registerY];
                     }
                     break;
+                    case 1: {
+                        registers[registerX] |= registers[registerY];
+                    }
+                    break;
+                    
+                    case 2: {
+                        registers[registerX] &= registers[registerY];
+                    }
+                    break;
+                    case 3: {
+                        registers[registerX] ^= registers[registerY];
+                    }
+                    break;
                     case 4: {
                         registers[registerX] += registers[registerY];
                         registers[0xf] = (registers[registerX] ) >> 8 != 0?1:0;
@@ -133,6 +155,14 @@ public class Chip8 {
                     case 5: {
                         registers[registerX] = registers[registerX] - registers[registerY];
                         registers[0xf] = (registers[registerX] ) >> 8 != 0?1:0;
+                    } break;
+                    case 6: {
+                        registers[0xf] = registers[registerY] & 0x1;
+                        registers[registerX] = registers[registerY] >> 1;
+                    } break;
+                    case 0xE: {
+                        registers[0xf] = (registers[registerY] ) >> 7;
+                        registers[registerX] = registers[registerY] << 1;
                     } break;
                     case 7: {
                         registers[registerX] = registers[registerY] - registers[registerX];
