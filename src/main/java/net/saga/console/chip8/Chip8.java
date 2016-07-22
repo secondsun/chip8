@@ -28,76 +28,127 @@ package net.saga.console.chip8;
  */
 public class Chip8 {
 
+    private int pc = 0x200;
+    private int i = 0;
+    private int[] registers = new int[0x10];
+
     public int getPC() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return pc;
     }
 
     public int getV0() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return registers[0] & 0xFF;
     }
 
     public int getV1() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return registers[1] & 0xFF;
     }
 
     public int getV2() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return registers[0x2] & 0xFF;
     }
 
     public int getV3() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return registers[0x3] & 0xFF;
     }
 
     public int getV4() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return registers[0x4] & 0xFF;
     }
 
     public int getV5() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return registers[0x5] & 0xFF;
     }
 
     public int getV6() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return registers[0x6] & 0xFF;
     }
 
     public int getV7() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return registers[0x7] & 0xFF;
     }
 
     public int getV8() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return registers[0x8] & 0xFF;
     }
 
     public int getV9() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return registers[0x9] & 0xFF;
     }
 
     public int getVA() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return registers[0xa] & 0xFF;
     }
 
     public int getVB() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return registers[0xb] & 0xFF;
     }
 
     public int getVC() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return registers[0xc] & 0xFF;
     }
 
     public int getVD() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return registers[0xd] & 0xFF;
     }
 
     public int getVE() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return registers[0xe] & 0xFF;
     }
 
     public int getVF() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return registers[0xf] & 0xFF;
     }
 
     public void execute(int i) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        final int high = (i & 0xF000) >> 12;
+
+        switch (high) {
+            case 6: {//6XNN	Store number NN in register VX
+                int low = 0x0FF & i;
+                int register = (i & 0x0f00) >> 8;
+                registers[register] = low;
+            }
+            break;
+            case 7: { //7XNN	Adds number NN to register VX
+                int low = 0x0FF & i;
+                int register = (i & 0x0f00) >> 8;
+                registers[register] += low;
+            }
+            break;
+            case 8: {
+                int low = 0x00F & i;
+                int registerX = (i & 0x0F00) >> 8;
+                int registerY = (i & 0x00F0) >> 4;
+
+                switch (low) {
+                    case 0: {
+                        registers[registerX] = registers[registerY];
+                    }
+                    break;
+                    case 4: {
+                        registers[registerX] += registers[registerY];
+                        registers[0xf] = (registers[registerX] ) >> 8 != 0?1:0;
+                    } break;
+                    case 5: {
+                        registers[registerX] = registers[registerX] - registers[registerY];
+                        registers[0xf] = (registers[registerX] ) >> 8 != 0?1:0;
+                    } break;
+                    case 7: {
+                        registers[registerX] = registers[registerY] - registers[registerX];
+                        registers[0xf] = (registers[registerX] ) >> 8 != 0?1:0;
+                    } break;
+                    default:
+                        throw new UnsupportedOperationException("Unsupported opcode.");
+                }
+
+            }
+            break;
+            default:
+                throw new UnsupportedOperationException("Unsupported opcode."); //To change body of generated methods, choose Tools | Templates.
+
+        }
+
     }
-    
+
 }
