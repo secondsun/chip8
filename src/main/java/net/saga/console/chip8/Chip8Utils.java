@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.channels.ByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,18 +35,17 @@ public final class Chip8Utils {
     
     public static Chip8 createFromRom(Path rom) throws IOException {
     
-        try (BufferedReader reader = Files.newBufferedReader(rom)) {
+            byte[] reader = Files.readAllBytes(rom);
             int index = 0x200;
             byte[] memory = new byte[4096];//4k memory
-            int read;
-            while ((read = reader.read()) != -1) {
+            for (byte read : reader) {
                 memory[index] = (byte) (read);
                 index += 1;
             }
                 
             Chip8 chip8 = new Chip8(memory);    
             return chip8;
-        }
+        
         
         
         

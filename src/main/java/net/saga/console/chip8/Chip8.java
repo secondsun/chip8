@@ -23,6 +23,7 @@
  */
 package net.saga.console.chip8;
 
+import java.util.Date;
 import java.util.Random;
 
 /**
@@ -35,9 +36,11 @@ public class Chip8 {
     private final int[] registers = new int[0x10];
     private final Random random = new Random();
     private int sp = 0;
+    private int delayTimer = 0;
     private final int[] stack = new int[16];
     private final byte[] memory;
-
+    private long nextTimer = 0;
+    
     public Chip8() {
         this.memory = new byte[4096];
     }
@@ -170,6 +173,21 @@ public class Chip8 {
                     throw new UnsupportedOperationException("Unsupported opcode.");
                 }
             }
+            case 0xF000: {
+                int low = i & 0xFF;
+                int register = (i & 0x0F00) >> 8;
+
+                switch(low){
+                        case 0x15:
+                            delayTimer = registers[register];
+                            break;
+                        case 0x07:
+                            registers[register] = delayTimer;
+                            break;
+                        default:
+                            throw new UnsupportedOperationException("Unsupported opcode:" + i);
+                }
+            }
             break;
 
             case 0xB000: {//BNNN Jump to NNN + V0
@@ -258,8 +276,19 @@ public class Chip8 {
     }
 
     public void cycle() {
-        int instruction = (memory[pc++] << 8) | memory[pc++];
+        int instruction = ((memory[pc++] << 8) & 0xFF00) | (memory[pc++] & 0xFF);
+        long time = System.currentTimeMillis();
+        if (time > nextTimer) {
+            countDownTimers();
+            nextTimer = time + (1000/60);
+        }
         execute(instruction);
+    }
+
+    private void countDownTimers() {
+        if (delayTimer != 0) {
+            delayTimer--;
+        }
     }
 
 }
