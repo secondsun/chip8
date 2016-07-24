@@ -173,6 +173,7 @@ public class Chip8 {
                     throw new UnsupportedOperationException("Unsupported opcode.");
                 }
             }
+            break;
             case 0xF000: {
                 int low = i & 0xFF;
                 int register = (i & 0x0F00) >> 8;

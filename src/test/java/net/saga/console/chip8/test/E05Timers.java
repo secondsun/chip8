@@ -58,9 +58,20 @@ public class E05Timers {
         }
     }
     
+    /**
+     * There is a second timer, the sound timer.  The sound timer will emit a tone
+     * until it reaches 0.  It operates on the same cycle as the delay timer.
+     * 
+     * Opcodes : 
+     *   0xFX18 Set the sound timer to the value in VX
+     * 
+     * 
+     */
     @Test
     public void testSoundTimer() {
-        throw new IllegalStateException("Not implemented");
+        chip8.execute(0xF018); //Set timer to 0x64
+        chip8.execute(0xF107); //Read timer into V1
+        throw new IllegalStateException("Not implemented.");
     }
     
 }
