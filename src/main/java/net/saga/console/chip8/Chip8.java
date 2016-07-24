@@ -36,7 +36,19 @@ public class Chip8 {
     private final Random random = new Random();
     private int sp = 0;
     private final int[] stack = new int[16];
+    private final byte[] memory;
 
+    public Chip8() {
+        this.memory = new byte[4096];
+    }
+    
+    public Chip8(byte[] memory) {
+        if (memory.length > 4096) {
+            throw new IllegalArgumentException("Memory may not be greater than 4096 bytes");
+        }
+        this.memory = memory;
+    }
+    
     public int getPC() {
         return pc;
     }
@@ -243,6 +255,11 @@ public class Chip8 {
 
         }
 
+    }
+
+    public void cycle() {
+        int instruction = (memory[pc++] << 8) | memory[pc++];
+        execute(instruction);
     }
 
 }
