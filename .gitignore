@@ -1,3 +1,4 @@
 target/**
 nb-**
 **/keycloak.json
+/nbproject/

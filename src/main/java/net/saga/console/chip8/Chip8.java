@@ -32,9 +32,11 @@ public class Chip8 {
 
     private int pc = 0x200;
     private int i = 0;
-    private int[] registers = new int[0x10];
+    private final int[] registers = new int[0x10];
     private final Random random = new Random();
-    
+    private int sp = 0;
+    private final int[] stack = new int[16];
+
     public int getPC() {
         return pc;
     }
@@ -104,28 +106,85 @@ public class Chip8 {
     }
 
     public void execute(int i) {
-        final int high = (i & 0xF000) >> 12;
+        final int high = (i & 0xF000);
 
         switch (high) {
-            case 6: {//6XNN	Store number NN in register VX
+            case 0x1000: {//1NNN Jump to NNN
+                int low = 0x0FFF & i;
+                pc = low;
+
+            }
+            break;
+            case 0x2000: {//2NNN start subroutine at NNN
+                stack[sp] = pc;
+                sp++;
+                int low = 0x0FFF & i;
+                pc = low;
+
+            } break;
+            case 0x3000: {//3XNN Skip if Vx = NN
+                int low = 0x0FF & i;
+                int register = (i & 0x0f00) >> 8;
+                if (registers[register] == low) {
+                    pc += 0x2;
+                }
+            } break;
+            case 0x5000: {//5XY0 Skip if Vx = Vy
+                int registery = (i & 0x00f0) >> 4;
+                int registerx = (i & 0x0f00) >> 8;
+                if (registers[registerx] == registers[registery]) {
+                    pc += 0x2;
+                }
+            } break;
+            case 0x4000: {//$XNN Skip if Vx != NN
+                int low = 0x0FF & i;
+                int register = (i & 0x0f00) >> 8;
+                if (registers[register] != low) {
+                    pc += 0x2;
+                }
+            } break;
+            case 0x9000: {//9XY0 Skip if Vx != Vy
+                int registery = (i & 0x00f0) >> 4;
+                int registerx = (i & 0x0f00) >> 8;
+                if (registers[registerx] != registers[registery]) {
+                    pc += 0x2;
+                }
+            } break;
+            case 0x0000: {
+                if (i == 0x00EE) {
+                    sp--;
+                    pc = stack[sp];
+                } else {
+                    throw new UnsupportedOperationException("Unsupported opcode.");
+                }
+            }
+            break;
+
+            case 0xB000: {//BNNN Jump to NNN + V0
+                int low = 0x0FFF & i;
+                pc = low + registers[0];
+
+            }
+            break;
+            case 0x6000: {//6XNN	Store number NN in register VX
                 int low = 0x0FF & i;
                 int register = (i & 0x0f00) >> 8;
                 registers[register] = low;
             }
             break;
-            case 7: { //7XNN	Adds number NN to register VX
+            case 0x7000: { //7XNN	Adds number NN to register VX
                 int low = 0x0FF & i;
                 int register = (i & 0x0f00) >> 8;
                 registers[register] += low;
             }
             break;
-            case 0xC: { //7XNN	Mask a random and  number NN to register VX
+            case 0xC000: { //7XNN	Mask a random and  number NN to register VX
                 int low = 0x0FF & i;
                 int register = (i & 0x0f00) >> 8;
                 registers[register] = random.nextInt(0xFF) & low;
             }
             break;
-            case 8: {
+            case 0x8000: {
                 int low = 0x00F & i;
                 int registerX = (i & 0x0F00) >> 8;
                 int registerY = (i & 0x00F0) >> 4;
@@ -139,7 +198,7 @@ public class Chip8 {
                         registers[registerX] |= registers[registerY];
                     }
                     break;
-                    
+
                     case 2: {
                         registers[registerX] &= registers[registerY];
                     }
@@ -150,24 +209,29 @@ public class Chip8 {
                     break;
                     case 4: {
                         registers[registerX] += registers[registerY];
-                        registers[0xf] = (registers[registerX] ) >> 8 != 0?1:0;
-                    } break;
+                        registers[0xf] = (registers[registerX]) >> 8 != 0 ? 1 : 0;
+                    }
+                    break;
                     case 5: {
                         registers[registerX] = registers[registerX] - registers[registerY];
-                        registers[0xf] = (registers[registerX] ) >> 8 != 0?1:0;
-                    } break;
+                        registers[0xf] = (registers[registerX]) >> 8 != 0 ? 1 : 0;
+                    }
+                    break;
                     case 6: {
                         registers[0xf] = registers[registerY] & 0x1;
                         registers[registerX] = registers[registerY] >> 1;
-                    } break;
+                    }
+                    break;
                     case 0xE: {
-                        registers[0xf] = (registers[registerY] ) >> 7;
+                        registers[0xf] = (registers[registerY]) >> 7;
                         registers[registerX] = registers[registerY] << 1;
-                    } break;
+                    }
+                    break;
                     case 7: {
                         registers[registerX] = registers[registerY] - registers[registerX];
-                        registers[0xf] = (registers[registerX] ) >> 8 != 0?1:0;
-                    } break;
+                        registers[0xf] = (registers[registerX]) >> 8 != 0 ? 1 : 0;
+                    }
+                    break;
                     default:
                         throw new UnsupportedOperationException("Unsupported opcode.");
                 }
