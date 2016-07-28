@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
  *
  * @author summers
  */
-public class E05Timers {
+public class E05TimersTest {
 
     private Chip8 chip8;
 

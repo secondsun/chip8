@@ -19,7 +19,7 @@ import org.junit.Test;
  *
  * @author summers
  */
-public class E03ClockExecutionAndMemory {
+public class E03ClockExecutionAndMemoryTest {
 
     private Chip8 chip8;
 
@@ -36,7 +36,7 @@ public class E03ClockExecutionAndMemory {
      */
     @Before
     public void loadMemory() throws IOException {
-        this.chip8 = Chip8Utils.createFromRom(E03ClockExecutionAndMemory.class.getResource("/E03TestRom.ch8"));
+        this.chip8 = Chip8Utils.createFromRom(E03ClockExecutionAndMemoryTest.class.getResource("/E03TestRom.ch8"));
     }
 
     /**

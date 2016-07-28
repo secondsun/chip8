@@ -7,6 +7,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 /**
  * This test suite will work with flow control op codes. They will adjust the
@@ -14,11 +15,11 @@ import org.junit.Test;
  *
  * @author summers
  */
-public class E04FlowControl {
+public class E04FlowControlTest {
 
     private Chip8 chip8;
 
-    public E04FlowControl() {
+    public E04FlowControlTest() {
     }
 
     @BeforeClass

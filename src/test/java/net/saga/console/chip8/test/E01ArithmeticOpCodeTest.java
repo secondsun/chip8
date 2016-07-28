@@ -16,11 +16,11 @@ import org.junit.Test;
  * Specifically there are several constants which are found below 0x0200 and
  * programs typically start at 0x0200
  */
-public class E01ArithmeticOpCodeTests {
+public class E01ArithmeticOpCodeTest {
 
     private Chip8 chip8;
 
-    public E01ArithmeticOpCodeTests() {
+    public E01ArithmeticOpCodeTest() {
     }
 
     @BeforeClass
