@@ -23,7 +23,6 @@
  */
 package net.saga.console.chip8;
 
-import java.util.Date;
 import java.util.Random;
 
 /**
@@ -37,6 +36,7 @@ public class Chip8 {
     private final Random random = new Random();
     private int sp = 0;
     private int delayTimer = 0;
+    private int soundTimer = 0;
     private final int[] stack = new int[16];
     private final byte[] memory;
     private long nextTimer = 0;
@@ -182,6 +182,9 @@ public class Chip8 {
                         case 0x15:
                             delayTimer = registers[register];
                             break;
+                        case 0x18:
+                            soundTimer = registers[register];
+                            break;
                         case 0x07:
                             registers[register] = delayTimer;
                             break;
@@ -282,14 +285,26 @@ public class Chip8 {
         if (time > nextTimer) {
             countDownTimers();
             nextTimer = time + (1000/60);
+            System.out.println("Current Time : " + time);
+            System.out.println("Next  Time : " + nextTimer);
+            
         }
         execute(instruction);
     }
 
     private void countDownTimers() {
-        if (delayTimer != 0) {
+        if (delayTimer > 0) {
             delayTimer--;
         }
+        if (soundTimer > 0) {
+            soundTimer--;
+            emitTone();
+        }
+    }
+
+    private void emitTone() {
+        Audio.appendTone();
+        Audio.playTone();
     }
 
 }

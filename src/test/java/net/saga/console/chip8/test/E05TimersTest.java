@@ -2,6 +2,7 @@
 package net.saga.console.chip8.test;
 
 import java.io.IOException;
+import net.saga.console.chip8.Audio;
 import net.saga.console.chip8.Chip8;
 import net.saga.console.chip8.Chip8Utils;
 import org.junit.Before;
@@ -27,6 +28,7 @@ public class E05TimersTest {
         this.chip8.execute(0x65B4);
         this.chip8.execute(0x6642);
         this.chip8.execute(0x6F25);
+        Audio.mute();
     }
 
     
@@ -51,7 +53,7 @@ public class E05TimersTest {
         
     }
     
-    @Test(timeout = 200000l)
+    @Test(timeout = 500l)
     public void testDelayTimerCountdown() {
         while(chip8.getV5() != 255) {
             chip8.cycle();
@@ -65,13 +67,29 @@ public class E05TimersTest {
      * Opcodes : 
      *   0xFX18 Set the sound timer to the value in VX
      * 
-     * 
      */
     @Test
     public void testSoundTimer() {
         chip8.execute(0xF018); //Set timer to 0x64
-        chip8.execute(0xF107); //Read timer into V1
-        throw new IllegalStateException("Not implemented.");
+        chip8.cycle();
+        assertNotEquals(1, Audio.getBuffer().length);
     }
+    
+    /**
+     * This test will test that sound is actually emitted.  It is disabled by
+     * default because it could be annoying.
+     */
+    @Test(timeout = 1100l)
+    public void testEmitSoundTimer() throws IOException {
+        Audio.reset();
+        Audio.unmute();
+        Chip8 soundChip = Chip8Utils.createFromRom(getClass().getResource("/E05SoundLoop.ch8"));
+        while(soundChip.getV5() != 255) {
+            soundChip.cycle();
+        }
+        assertNotEquals(1, Audio.getBuffer().length);
+        Audio.mute();
+    }
+    
     
 }
