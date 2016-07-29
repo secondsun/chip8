@@ -31,7 +31,7 @@ import java.util.Random;
 public class Chip8 {
 
     private int pc = 0x200;
-    private int i = 0;
+    private int iRegister = 0;
     private final int[] registers = new int[0x10];
     private final Random random = new Random();
     private int sp = 0;
@@ -39,6 +39,7 @@ public class Chip8 {
     private int soundTimer = 0;
     private final int[] stack = new int[16];
     private final byte[] memory;
+    private final byte[] video = new byte[64*32];
     private long nextTimer = 0;
     
     public Chip8() {
@@ -120,12 +121,12 @@ public class Chip8 {
         return registers[0xf] & 0xFF;
     }
 
-    public void execute(int i) {
-        final int high = (i & 0xF000);
+    public void execute(int instruction) {
+        final int high = (instruction & 0xF000);
 
         switch (high) {
             case 0x1000: {//1NNN Jump to NNN
-                int low = 0x0FFF & i;
+                int low = 0x0FFF & instruction;
                 pc = low;
 
             }
@@ -133,50 +134,50 @@ public class Chip8 {
             case 0x2000: {//2NNN start subroutine at NNN
                 stack[sp] = pc;
                 sp++;
-                int low = 0x0FFF & i;
+                int low = 0x0FFF & instruction;
                 pc = low;
 
             } break;
             case 0x3000: {//3XNN Skip if Vx = NN
-                int low = 0x0FF & i;
-                int register = (i & 0x0f00) >> 8;
+                int low = 0x0FF & instruction;
+                int register = (instruction & 0x0f00) >> 8;
                 if (registers[register] == low) {
                     pc += 0x2;
                 }
             } break;
             case 0x5000: {//5XY0 Skip if Vx = Vy
-                int registery = (i & 0x00f0) >> 4;
-                int registerx = (i & 0x0f00) >> 8;
+                int registery = (instruction & 0x00f0) >> 4;
+                int registerx = (instruction & 0x0f00) >> 8;
                 if (registers[registerx] == registers[registery]) {
                     pc += 0x2;
                 }
             } break;
             case 0x4000: {//$XNN Skip if Vx != NN
-                int low = 0x0FF & i;
-                int register = (i & 0x0f00) >> 8;
+                int low = 0x0FF & instruction;
+                int register = (instruction & 0x0f00) >> 8;
                 if (registers[register] != low) {
                     pc += 0x2;
                 }
             } break;
             case 0x9000: {//9XY0 Skip if Vx != Vy
-                int registery = (i & 0x00f0) >> 4;
-                int registerx = (i & 0x0f00) >> 8;
+                int registery = (instruction & 0x00f0) >> 4;
+                int registerx = (instruction & 0x0f00) >> 8;
                 if (registers[registerx] != registers[registery]) {
                     pc += 0x2;
                 }
             } break;
             case 0x0000: {
-                if (i == 0x00EE) {
+                if (instruction == 0x00EE) {
                     sp--;
                     pc = stack[sp];
                 } else {
-                    throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(i));
+                    throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(instruction));
                 }
             }
             break;
             case 0xF000: {
-                int low = i & 0xFF;
-                int register = (i & 0x0F00) >> 8;
+                int low = instruction & 0xFF;
+                int register = (instruction & 0x0F00) >> 8;
 
                 switch(low){
                         case 0x15:
@@ -195,39 +196,42 @@ public class Chip8 {
                         case 0x07:
                             registers[register] = delayTimer;
                             break;
+                        case 0x1E:
+                            iRegister += registers[register];
+                            break;
                         default:
-                            throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(i));
+                            throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(instruction));
                 }
             }
             break;
 
             case 0xB000: {//BNNN Jump to NNN + V0
-                int low = 0x0FFF & i;
+                int low = 0x0FFF & instruction;
                 pc = low + registers[0];
 
             }
             break;
             case 0x6000: {//6XNN	Store number NN in register VX
-                int low = 0x0FF & i;
-                int register = (i & 0x0f00) >> 8;
+                int low = 0x0FF & instruction;
+                int register = (instruction & 0x0f00) >> 8;
                 registers[register] = low;
             }
             break;
             case 0x7000: { //7XNN	Adds number NN to register VX
-                int low = 0x0FF & i;
-                int register = (i & 0x0f00) >> 8;
+                int low = 0x0FF & instruction;
+                int register = (instruction & 0x0f00) >> 8;
                 registers[register] += low;
             }
             break;
             case 0xC000: { //7XNN	Mask a random and  number NN to register VX
-                int low = 0x0FF & i;
-                int register = (i & 0x0f00) >> 8;
+                int low = 0x0FF & instruction;
+                int register = (instruction & 0x0f00) >> 8;
                 registers[register] = random.nextInt(0xFF) & low;
             }
             break;
             case 0xE000: { //EXop Skips based on keyboard input
-                int low = 0x0FF & i;
-                int register = (i & 0x0f00) >> 8;
+                int low = 0x0FF & instruction;
+                int register = (instruction & 0x0f00) >> 8;
                 
             switch (low) {
                 case 0x9E:
@@ -243,15 +247,15 @@ public class Chip8 {
                     }
                     break;
                 default:
-                    throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(i));
+                    throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(instruction));
             }
                 
             }
             break;
             case 0x8000: {
-                int low = 0x00F & i;
-                int registerX = (i & 0x0F00) >> 8;
-                int registerY = (i & 0x00F0) >> 4;
+                int low = 0x00F & instruction;
+                int registerX = (instruction & 0x0F00) >> 8;
+                int registerY = (instruction & 0x00F0) >> 4;
 
                 switch (low) {
                     case 0: {
@@ -297,13 +301,35 @@ public class Chip8 {
                     }
                     break;
                     default:
-                        throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(i));
+                        throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(instruction));
                 }
 
             }
             break;
+            case 0xA000: {
+                int low = 0x0FFF & instruction;
+                iRegister = low;
+            }
+            break;
+            case 0xD000: {
+                int lines = 0x00F & instruction;
+                int registerX = (instruction & 0x0F00) >> 8;
+                int registerY = (instruction & 0x00F0) >> 4;
+
+                int x = registers[registerX];
+                int y = registers[registerY];
+                registers[0xF] = 0;
+                for (int count = 0;count < lines; count++) {
+                    long oldVideo = getSpriteRow(x, y+count);
+                    writeVideo(x, y+count, memory[iRegister + count]);
+                    long newVideo = getSpriteRow(x, y+count);
+                    registers[0xF] = (newVideo & oldVideo) == 0 ? 0: 1;
+                }
+                
+            }
+            break;
             default:
-                throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(i));
+                throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(instruction));
 
         }
 
@@ -331,5 +357,28 @@ public class Chip8 {
         }
     }
 
+    public int getiRegister() {
+        return iRegister;
+    }
 
+    public byte[] getScreen() {
+        return video;
+    }
+
+    /**
+     * 
+     * Packs 8 bytes (for the 8 pixels of the sprite) into a long
+     * 
+     * @param x
+     * @param y
+     * @return 
+     */
+    private long getSpriteRow(int x, int y) {
+        byte byte1 = video[x + ]
+    }
+
+    private void writeVideo(int x, int i, byte b) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
 }
