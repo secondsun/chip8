@@ -285,9 +285,6 @@ public class Chip8 {
         if (time > nextTimer) {
             countDownTimers();
             nextTimer = time + (1000/60);
-            System.out.println("Current Time : " + time);
-            System.out.println("Next  Time : " + nextTimer);
-            
         }
         execute(instruction);
     }
