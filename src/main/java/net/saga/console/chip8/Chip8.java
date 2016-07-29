@@ -170,7 +170,7 @@ public class Chip8 {
                     sp--;
                     pc = stack[sp];
                 } else {
-                    throw new UnsupportedOperationException("Unsupported opcode.");
+                    throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(i));
                 }
             }
             break;
@@ -185,11 +185,18 @@ public class Chip8 {
                         case 0x18:
                             soundTimer = registers[register];
                             break;
+                        case 0x0A:
+                            if (Input.read() == 0) {
+                                pc -= 0x2;
+                            } else {
+                                registers[register] = Input.read();
+                            }
+                            break;                            
                         case 0x07:
                             registers[register] = delayTimer;
                             break;
                         default:
-                            throw new UnsupportedOperationException("Unsupported opcode:" + i);
+                            throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(i));
                 }
             }
             break;
@@ -216,6 +223,29 @@ public class Chip8 {
                 int low = 0x0FF & i;
                 int register = (i & 0x0f00) >> 8;
                 registers[register] = random.nextInt(0xFF) & low;
+            }
+            break;
+            case 0xE000: { //EXop Skips based on keyboard input
+                int low = 0x0FF & i;
+                int register = (i & 0x0f00) >> 8;
+                
+            switch (low) {
+                case 0x9E:
+                    //skip if register == input
+                    if (registers[register] == Input.read()) {
+                        pc += 0x2;
+                    }
+                    break;
+                case 0xA1:
+                    //skip if register != input
+                    if (registers[register] != Input.read()) {
+                        pc += 0x2;
+                    }
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(i));
+            }
+                
             }
             break;
             case 0x8000: {
@@ -267,13 +297,13 @@ public class Chip8 {
                     }
                     break;
                     default:
-                        throw new UnsupportedOperationException("Unsupported opcode.");
+                        throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(i));
                 }
 
             }
             break;
             default:
-                throw new UnsupportedOperationException("Unsupported opcode."); //To change body of generated methods, choose Tools | Templates.
+                throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(i));
 
         }
 
