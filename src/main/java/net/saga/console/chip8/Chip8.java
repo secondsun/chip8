@@ -298,13 +298,11 @@ public class Chip8 {
         }
         if (soundTimer > 0) {
             soundTimer--;
-            emitTone();
+            Audio.play();
+        } else {
+            Audio.stop();
         }
     }
 
-    private void emitTone() {
-        Audio.appendTone();
-        Audio.playTone();
-    }
 
 }

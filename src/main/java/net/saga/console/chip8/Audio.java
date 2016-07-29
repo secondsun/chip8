@@ -1,10 +1,9 @@
 package net.saga.console.chip8;
 
-import java.util.Arrays;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.SourceDataLine;
+import javax.sound.midi.MidiChannel;
+import javax.sound.midi.MidiSystem;
+import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.Synthesizer;
 
 /**
  * This class is a helper class for emitting, playing, and viewing audio data.
@@ -12,75 +11,40 @@ import javax.sound.sampled.SourceDataLine;
  * @author summers
  */
 public final class Audio {
-
-    private static byte[] BUF = new byte[1];
-    private static boolean MUTE = false;
-    private static final AudioFormat AF = new AudioFormat((float) 44100, 8, 1, true, false);
-    private static SourceDataLine SDL;
-
+    
+    private static final Synthesizer SYNTH;
+    private static final MidiChannel[] CHANNELS;
+    private static boolean PLAYING = false;
     static {
         try {
-            SDL = AudioSystem.getSourceDataLine(AF);
-            SDL.open();
-            SDL.start();
-        } catch (LineUnavailableException ex) {
-            MUTE = true;
-            SDL = null;
-        }
-    }
-
-    public static void reset() {
-        if (SDL != null) {
-            if (SDL.isOpen()) {
-                SDL.stop();
-                SDL.close();
-            }
-        }
-    
-        BUF = new byte[1];
-        MUTE = false;
-        try {
-            SDL = AudioSystem.getSourceDataLine(AF);
-            SDL.open();
-            SDL.start();
-        } catch (LineUnavailableException ex) {
-            MUTE = true;
-            SDL = null;
-        }
-    }
-
-    private Audio() {
-    }
-
-    //Adds 1/60 second of a tone to the audio buffer
-    public static void appendTone() {
-        if (BUF.length == 1) {
-            BUF = new byte[44100/60];
-            for (int i = 0; i < (1000/60) * (44100/1000); i++) {
-                double angle = i / ((float) 44100 / 880) * 2.0 * Math.PI;
-                BUF[i] = (byte) (Math.sin(angle) * 20);
-            }
-        }
-    }
-
-    public static void playTone() {
-        if (SDL != null && !MUTE) {
-            System.out.println(BUF[0] - BUF[BUF.length - 1]);
-                SDL.write(BUF, 0, BUF.length);
+            SYNTH = MidiSystem.getSynthesizer();
+            SYNTH.open();
+            CHANNELS = SYNTH.getChannels();
+        } catch (MidiUnavailableException ex) {
+            throw new RuntimeException(ex);
         }
     }
     
-
+    public static void play() {
+        if (!PLAYING) {
+            CHANNELS[0].noteOn(60, 100);
+            PLAYING = true;
+        }
+    }
+    
+    public static void stop() {
+        if (PLAYING) {
+            CHANNELS[0].noteOff(60);
+            PLAYING = false;
+        }
+    }
+    
     public static void mute() {
-        MUTE = true;
+        CHANNELS[0].setMute(true);
     }
-
+    
     public static void unmute() {
-        MUTE = false;
+        CHANNELS[0].setMute(false);
     }
-
-    public static byte[] getBuffer() {
-        return Arrays.copyOf(BUF, BUF.length);
-    }
-
+    
 }
