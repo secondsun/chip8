@@ -39,7 +39,7 @@ public class Chip8 {
     private int soundTimer = 0;
     private final int[] stack = new int[16];
     private final byte[] memory;
-    private final byte[] video = new byte[64*32];
+    private byte[] video = new byte[64*32];
     private long nextTimer = 0;
     
     public Chip8() {
@@ -167,12 +167,17 @@ public class Chip8 {
                 }
             } break;
             case 0x0000: {
-                if (instruction == 0x00EE) {
+            switch (instruction) {
+                case 0x00EE:
                     sp--;
                     pc = stack[sp];
-                } else {
+                    break;
+                case 0x00E0:
+                    video = new byte[video.length];
+                    break;
+                default:
                     throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(instruction));
-                }
+            }
             }
             break;
             case 0xF000: {
@@ -322,8 +327,7 @@ public class Chip8 {
                 for (int count = 0;count < lines; count++) {
                     long oldVideo = getSpriteRow(x, y+count);
                     writeVideo(x, y+count, memory[iRegister + count]);
-                    long newVideo = getSpriteRow(x, y+count);
-                    registers[0xF] = (newVideo & oldVideo) == 0 ? 0: 1;
+                    registers[0xF] = (memory[iRegister + count] & oldVideo) == 0 ? 0: 1;
                 }
                 
             }
@@ -367,18 +371,47 @@ public class Chip8 {
 
     /**
      * 
-     * Packs 8 bytes (for the 8 pixels of the sprite) into a long
+     * Packs a graphics row (8 pixels of the sprite) into a btye
      * 
      * @param x
      * @param y
      * @return 
      */
-    private long getSpriteRow(int x, int y) {
-        byte byte1 = video[x + ]
+    private byte getSpriteRow(int x, int y) {
+        x = x % 64;
+        y = y % 32;
+        byte byte1 = video[x + y * 64];
+        byte byte2 = video[x + 1 + y *64];
+        byte byte3 = video[x + 2 + y *64];
+        byte byte4 = video[x + 3 + y *64];
+        byte byte5 = video[x + 4 + y *64];
+        byte byte6 = video[x + 5 + y *64];
+        byte byte7 = video[x + 6 + y *64];
+        byte byte8 = video[x + 7 + y *64];
+        
+        return (byte) ((byte1 << 7) | 
+                (byte2 << 6) | 
+                (byte3 << 5) | 
+                (byte4 << 4) | 
+                (byte5 << 3) | 
+                (byte6 << 2) | 
+                (byte7 << 1) | 
+                (byte8));
+                
+        
     }
 
-    private void writeVideo(int x, int i, byte b) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private void writeVideo(int x, int y, byte b) {
+        x = x % 64;
+        y = y % 32;
+        video[(x) + (y) *64] ^= (byte)((b & 0b10000000) >> 7);
+        video[1 + (x) + (y) *64] ^= (byte)((b & 0b01000000) >> 6);
+        video[2 + (x) + (y) *64] ^= (byte)((b & 0b00100000) >> 5);
+        video[3 + (x) + (y) *64] ^= (byte)((b & 0b00010000) >> 4);
+        video[4 + (x) + (y) *64] ^= (byte)((b & 0b00001000) >> 3);
+        video[5 + (x) + (y) *64] ^= (byte)((b & 0b00000100) >> 2);
+        video[6 + (x) + (y) *64] ^= (byte)((b & 0b00000010) >> 1);
+        video[7 + (x) + (y) *64] ^= (byte)((b & 0b00000001));
     }
     
 }

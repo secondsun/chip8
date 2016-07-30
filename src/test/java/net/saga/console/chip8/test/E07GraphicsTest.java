@@ -95,27 +95,83 @@ public class E07GraphicsTest {
         assertEquals(0, video[45 + 64*19]);
         assertEquals(0, video[46 + 64*19]);
        
-        chip8.execute(0xD212); // Draw Sprite at 18, 39
+        chip8.execute(0xD122); // Draw Sprite at 39,18
         assertEquals(1, chip8.getVF());
         
         video = chip8.getScreen();
-        assertEquals(0, video[18 + 64*39]);
-        assertEquals(0, video[19 + 64*39]);
-        assertEquals(0, video[20 + 64*39]);
-        assertEquals(0, video[21 + 64*39]);
-        assertEquals(0, video[22 + 64*39]);
-        assertEquals(0, video[23 + 64*39]);
-        assertEquals(0, video[24 + 64*39]);
-        assertEquals(0, video[25 + 64*39]);
+        assertEquals(0, video[39 + 64*18]);
+        assertEquals(0, video[40 + 64*18]);
+        assertEquals(0, video[41 + 64*18]);
+        assertEquals(0, video[42 + 64*18]);
+        assertEquals(0, video[43 + 64*18]);
+        assertEquals(0, video[44 + 64*18]);
+        assertEquals(0, video[45 + 64*18]);
+        assertEquals(0, video[46 + 64*18]);
         
-        assertEquals(0, video[18 + 64*40]);
-        assertEquals(0, video[19 + 64*40]);
-        assertEquals(0, video[20 + 64*40]);
-        assertEquals(0, video[21 + 64*40]);
-        assertEquals(0, video[22 + 64*40]);
-        assertEquals(0, video[23 + 64*40]);
-        assertEquals(0, video[24 + 64*40]);
-        assertEquals(0, video[25 + 64*40]);
+        assertEquals(0, video[39 + 64*19]);
+        assertEquals(0, video[40 + 64*19]);
+        assertEquals(0, video[41 + 64*19]);
+        assertEquals(0, video[42 + 64*19]);
+        assertEquals(0, video[43 + 64*19]);
+        assertEquals(0, video[44 + 64*19]);
+        assertEquals(0, video[45 + 64*19]);
+        assertEquals(0, video[46 + 64*19]);
         
     }
+    
+    /**
+     * Sprites wrap around on their axis.  IE If you draw to X 65 it will wrap 
+     * to position 1.
+     */
+    @Test 
+    public void drawSpriteWrap() {
+       chip8.execute(0xA202);
+       chip8.execute(0xD212); // Draw Sprite at 18, 7 (39 wraps to 7)
+        assertEquals(0, chip8.getVF());
+        
+        byte[] video = chip8.getScreen();
+        assertEquals(1, video[18 + 64*7]);
+        assertEquals(1, video[19 + 64*7]);
+        assertEquals(1, video[20 + 64*7]);
+        assertEquals(1, video[21 + 64*7]);
+        assertEquals(1, video[22 + 64*7]);
+        assertEquals(1, video[23 + 64*7]);
+        assertEquals(1, video[24 + 64*7]);
+        assertEquals(1, video[25 + 64*7]);
+        
+        assertEquals(0, video[18 + 64*8]);
+        assertEquals(0, video[19 + 64*8]);
+        assertEquals(1, video[20 + 64*8]);
+        assertEquals(1, video[21 + 64*8]);
+        assertEquals(1, video[22 + 64*8]);
+        assertEquals(1, video[23 + 64*8]);
+        assertEquals(0, video[24 + 64*8]);
+        assertEquals(0, video[25 + 64*8]);
+       
+    }
+    
+     /**
+     * The opcode 00E0 clears the screen.
+     * 
+     */
+    @Test
+    public void testClearVideo() {
+        chip8.execute(0xA202);
+        chip8.execute(0xD212); // Draw Sprite at 18, 7 (39 wraps to 7)
+        chip8.execute(0x00E0);
+        
+        byte[] video = chip8.getScreen();
+        
+        assertEquals(0, video[18 + 64*7]);
+        assertEquals(0, video[19 + 64*7]);
+        assertEquals(0, video[20 + 64*7]);
+        assertEquals(0, video[21 + 64*7]);
+        assertEquals(0, video[22 + 64*7]);
+        assertEquals(0, video[23 + 64*7]);
+        assertEquals(0, video[24 + 64*7]);
+        assertEquals(0, video[25 + 64*7]);
+        
+        
+    }
+    
 }
