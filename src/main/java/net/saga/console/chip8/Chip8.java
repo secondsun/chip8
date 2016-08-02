@@ -39,20 +39,22 @@ public class Chip8 {
     private int soundTimer = 0;
     private final int[] stack = new int[16];
     private final byte[] memory;
-    private byte[] video = new byte[64*32];
+    private byte[] video = new byte[64 * 32];
     private long nextTimer = 0;
-    
+
     public Chip8() {
         this.memory = new byte[4096];
+        loadFont(memory);
     }
-    
+
     public Chip8(byte[] memory) {
         if (memory.length > 4096) {
             throw new IllegalArgumentException("Memory may not be greater than 4096 bytes");
         }
         this.memory = memory;
+        loadFont(memory);
     }
-    
+
     public int getPC() {
         return pc;
     }
@@ -137,75 +139,83 @@ public class Chip8 {
                 int low = 0x0FFF & instruction;
                 pc = low;
 
-            } break;
+            }
+            break;
             case 0x3000: {//3XNN Skip if Vx = NN
                 int low = 0x0FF & instruction;
                 int register = (instruction & 0x0f00) >> 8;
                 if (registers[register] == low) {
                     pc += 0x2;
                 }
-            } break;
+            }
+            break;
             case 0x5000: {//5XY0 Skip if Vx = Vy
                 int registery = (instruction & 0x00f0) >> 4;
                 int registerx = (instruction & 0x0f00) >> 8;
                 if (registers[registerx] == registers[registery]) {
                     pc += 0x2;
                 }
-            } break;
+            }
+            break;
             case 0x4000: {//$XNN Skip if Vx != NN
                 int low = 0x0FF & instruction;
                 int register = (instruction & 0x0f00) >> 8;
                 if (registers[register] != low) {
                     pc += 0x2;
                 }
-            } break;
+            }
+            break;
             case 0x9000: {//9XY0 Skip if Vx != Vy
                 int registery = (instruction & 0x00f0) >> 4;
                 int registerx = (instruction & 0x0f00) >> 8;
                 if (registers[registerx] != registers[registery]) {
                     pc += 0x2;
                 }
-            } break;
-            case 0x0000: {
-            switch (instruction) {
-                case 0x00EE:
-                    sp--;
-                    pc = stack[sp];
-                    break;
-                case 0x00E0:
-                    video = new byte[video.length];
-                    break;
-                default:
-                    throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(instruction));
             }
+            break;
+            case 0x0000: {
+                switch (instruction) {
+                    case 0x00EE:
+                        sp--;
+                        pc = stack[sp];
+                        break;
+                    case 0x00E0:
+                        video = new byte[video.length];
+                        break;
+                    default:
+                        throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(instruction));
+                }
             }
             break;
             case 0xF000: {
                 int low = instruction & 0xFF;
                 int register = (instruction & 0x0F00) >> 8;
 
-                switch(low){
-                        case 0x15:
-                            delayTimer = registers[register];
-                            break;
-                        case 0x18:
-                            soundTimer = registers[register];
-                            break;
-                        case 0x0A:
-                            if (Input.read() == 0) {
-                                pc -= 0x2;
-                            } else {
-                                registers[register] = Input.read();
-                            }
-                            break;                            
-                        case 0x07:
-                            registers[register] = delayTimer;
-                            break;
-                        case 0x1E:
-                            iRegister += registers[register];
-                            break;
-                        default:
-                            throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(instruction));
+                switch (low) {
+                    case 0x15:
+                        delayTimer = registers[register];
+                        break;
+                    case 0x18:
+                        soundTimer = registers[register];
+                        break;
+                    case 0x0A:
+                        if (Input.read() == 0) {
+                            pc -= 0x2;
+                        } else {
+                            registers[register] = Input.read();
+                        }
+                        break;
+                    case 0x07:
+                        registers[register] = delayTimer;
+                        break;
+                    case 0x29:
+                        iRegister = getCharacterAddress(registers[register]);
+                        break;
+                    case 0x1E:
+                        iRegister += registers[register];
+                        break;
+                    default:
+                        throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(instruction));
                 }
             }
             break;
@@ -237,24 +247,24 @@ public class Chip8 {
             case 0xE000: { //EXop Skips based on keyboard input
                 int low = 0x0FF & instruction;
                 int register = (instruction & 0x0f00) >> 8;
-                
-            switch (low) {
-                case 0x9E:
-                    //skip if register == input
-                    if (registers[register] == Input.read()) {
-                        pc += 0x2;
-                    }
-                    break;
-                case 0xA1:
-                    //skip if register != input
-                    if (registers[register] != Input.read()) {
-                        pc += 0x2;
-                    }
-                    break;
-                default:
-                    throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(instruction));
-            }
-                
+
+                switch (low) {
+                    case 0x9E:
+                        //skip if register == input
+                        if (registers[register] == Input.read()) {
+                            pc += 0x2;
+                        }
+                        break;
+                    case 0xA1:
+                        //skip if register != input
+                        if (registers[register] != Input.read()) {
+                            pc += 0x2;
+                        }
+                        break;
+                    default:
+                        throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(instruction));
+                }
+
             }
             break;
             case 0x8000: {
@@ -324,12 +334,12 @@ public class Chip8 {
                 int x = registers[registerX];
                 int y = registers[registerY];
                 registers[0xF] = 0;
-                for (int count = 0;count < lines; count++) {
-                    long oldVideo = getSpriteRow(x, y+count);
-                    writeVideo(x, y+count, memory[iRegister + count]);
-                    registers[0xF] = (memory[iRegister + count] & oldVideo) == 0 ? 0: 1;
+                for (int count = 0; count < lines; count++) {
+                    long oldVideo = getSpriteRow(x, y + count);
+                    writeVideo(x, y + count, memory[iRegister + count]);
+                    registers[0xF] = (memory[iRegister + count] & oldVideo) == 0 ? 0 : 1;
                 }
-                
+
             }
             break;
             default:
@@ -344,7 +354,7 @@ public class Chip8 {
         long time = System.currentTimeMillis();
         if (time > nextTimer) {
             countDownTimers();
-            nextTimer = time + (1000/60);
+            nextTimer = time + (1000 / 60);
         }
         execute(instruction);
     }
@@ -370,48 +380,155 @@ public class Chip8 {
     }
 
     /**
-     * 
+     *
      * Packs a graphics row (8 pixels of the sprite) into a btye
-     * 
+     *
      * @param x
      * @param y
-     * @return 
+     * @return
      */
     private byte getSpriteRow(int x, int y) {
         x = x % 64;
         y = y % 32;
         byte byte1 = video[x + y * 64];
-        byte byte2 = video[x + 1 + y *64];
-        byte byte3 = video[x + 2 + y *64];
-        byte byte4 = video[x + 3 + y *64];
-        byte byte5 = video[x + 4 + y *64];
-        byte byte6 = video[x + 5 + y *64];
-        byte byte7 = video[x + 6 + y *64];
-        byte byte8 = video[x + 7 + y *64];
-        
-        return (byte) ((byte1 << 7) | 
-                (byte2 << 6) | 
-                (byte3 << 5) | 
-                (byte4 << 4) | 
-                (byte5 << 3) | 
-                (byte6 << 2) | 
-                (byte7 << 1) | 
-                (byte8));
-                
-        
+        byte byte2 = video[x + 1 + y * 64];
+        byte byte3 = video[x + 2 + y * 64];
+        byte byte4 = video[x + 3 + y * 64];
+        byte byte5 = video[x + 4 + y * 64];
+        byte byte6 = video[x + 5 + y * 64];
+        byte byte7 = video[x + 6 + y * 64];
+        byte byte8 = video[x + 7 + y * 64];
+
+        return (byte) ((byte1 << 7)
+                | (byte2 << 6)
+                | (byte3 << 5)
+                | (byte4 << 4)
+                | (byte5 << 3)
+                | (byte6 << 2)
+                | (byte7 << 1)
+                | (byte8));
+
     }
 
     private void writeVideo(int x, int y, byte b) {
         x = x % 64;
         y = y % 32;
-        video[(x) + (y) *64] ^= (byte)((b & 0b10000000) >> 7);
-        video[1 + (x) + (y) *64] ^= (byte)((b & 0b01000000) >> 6);
-        video[2 + (x) + (y) *64] ^= (byte)((b & 0b00100000) >> 5);
-        video[3 + (x) + (y) *64] ^= (byte)((b & 0b00010000) >> 4);
-        video[4 + (x) + (y) *64] ^= (byte)((b & 0b00001000) >> 3);
-        video[5 + (x) + (y) *64] ^= (byte)((b & 0b00000100) >> 2);
-        video[6 + (x) + (y) *64] ^= (byte)((b & 0b00000010) >> 1);
-        video[7 + (x) + (y) *64] ^= (byte)((b & 0b00000001));
+        video[(x) + (y) * 64] ^= (byte) ((b & 0b10000000) >> 7);
+        video[1 + (x) + (y) * 64] ^= (byte) ((b & 0b01000000) >> 6);
+        video[2 + (x) + (y) * 64] ^= (byte) ((b & 0b00100000) >> 5);
+        video[3 + (x) + (y) * 64] ^= (byte) ((b & 0b00010000) >> 4);
+        video[4 + (x) + (y) * 64] ^= (byte) ((b & 0b00001000) >> 3);
+        video[5 + (x) + (y) * 64] ^= (byte) ((b & 0b00000100) >> 2);
+        video[6 + (x) + (y) * 64] ^= (byte) ((b & 0b00000010) >> 1);
+        video[7 + (x) + (y) * 64] ^= (byte) ((b & 0b00000001));
     }
-    
+
+    private int getCharacterAddress(int digit) {
+        if (digit > 0xf) {
+            throw new IllegalArgumentException(digit + " is not a vlaid character");
+        }
+        return 5 * digit;
+    }
+
+    private void loadFont(byte[] memory) {
+        int i = 0;
+
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x90;
+        memory[i++] = (byte) 0x90;
+        memory[i++] = (byte) 0x90;
+        memory[i++] = (byte) 0xF0;
+
+        memory[i++] = (byte) 0x20;
+        memory[i++] = (byte) 0x60;
+        memory[i++] = (byte) 0x20;
+        memory[i++] = (byte) 0x20;
+        memory[i++] = (byte) 0x70;
+
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x10;
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x80;
+        memory[i++] = (byte) 0xF0;
+
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x10;
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x10;
+        memory[i++] = (byte) 0xF0;
+
+        memory[i++] = (byte) 0x90;
+        memory[i++] = (byte) 0x90;
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x10;
+        memory[i++] = (byte) 0x10;
+
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x80;
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x10;
+        memory[i++] = (byte) 0xF0;
+
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x80;
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x90;
+        memory[i++] = (byte) 0xF0;
+
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x10;
+        memory[i++] = (byte) 0x20;
+        memory[i++] = (byte) 0x40;
+        memory[i++] = (byte) 0x40;
+
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x90;
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x90;
+        memory[i++] = (byte) 0xF0;
+
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x90;
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x90;
+        memory[i++] = (byte) 0xF0;
+
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x90;
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x90;
+        memory[i++] = (byte) 0x90;
+
+        memory[i++] = (byte) 0xE0;
+        memory[i++] = (byte) 0x90;
+        memory[i++] = (byte) 0xE0;
+        memory[i++] = (byte) 0x90;
+        memory[i++] = (byte) 0xE0;
+
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x80;
+        memory[i++] = (byte) 0x80;
+        memory[i++] = (byte) 0x80;
+        memory[i++] = (byte) 0xF0;
+
+        memory[i++] = (byte) 0xE0;
+        memory[i++] = (byte) 0x90;
+        memory[i++] = (byte) 0x90;
+        memory[i++] = (byte) 0x90;
+        memory[i++] = (byte) 0xE0;
+
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x80;
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x80;
+        memory[i++] = (byte) 0xF0;
+
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x80;
+        memory[i++] = (byte) 0xF0;
+        memory[i++] = (byte) 0x80;
+        memory[i++] = (byte) 0x80;
+
+    }
+
 }
