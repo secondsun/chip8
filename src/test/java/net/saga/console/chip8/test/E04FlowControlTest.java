@@ -3,7 +3,6 @@ package net.saga.console.chip8.test;
 import net.saga.console.chip8.Chip8;
 import org.junit.After;
 import org.junit.AfterClass;
-import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;

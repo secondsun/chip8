@@ -37,9 +37,13 @@ public final class Chip8Utils {
         byte[] reader = Files.readAllBytes(rom);
         int index = 0x200;
         byte[] memory = new byte[4096];//4k memory
-        for (byte read : reader) {
-            memory[index] = (byte) (read);
-            index += 1;
+        try {
+            for (byte read : reader) {
+                memory[index] = (byte) (read);
+                index += 1;
+            }
+        } catch (ArrayIndexOutOfBoundsException ignore) {
+            throw new IOException("File is too big to fit in memory", ignore);
         }
 
         Chip8 chip8 = new Chip8(memory);
