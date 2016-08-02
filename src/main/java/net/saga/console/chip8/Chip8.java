@@ -23,6 +23,7 @@
  */
 package net.saga.console.chip8;
 
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -195,6 +196,20 @@ public class Chip8 {
                     case 0x15:
                         delayTimer = registers[register];
                         break;
+                    case 0x65: {
+                        byte maxRegister = (byte) register;
+                        for (int i = 0; i <= maxRegister; i++) {
+                            registers[i] = memory[iRegister];
+                            iRegister++;
+                        }
+                        }break;
+                    case 0x55:
+                        byte maxRegister = (byte) register;
+                        for (int i = 0; i <= maxRegister; i++) {
+                            memory[iRegister] = (byte) registers[i];
+                            iRegister++;
+                        }
+                        break;
                     case 0x18:
                         soundTimer = registers[register];
                         break;
@@ -210,6 +225,12 @@ public class Chip8 {
                         break;
                     case 0x29:
                         iRegister = getCharacterAddress(registers[register]);
+                        break;
+                    case 0x33:
+                        int value = registers[register];
+                        memory[iRegister] = (byte) (value / 100);
+                        memory[iRegister + 1] = (byte) (((value) % 100) / 10);
+                        memory[iRegister + 2] = (byte) (((value) % 100) % 10);
                         break;
                     case 0x1E:
                         iRegister += registers[register];
@@ -529,6 +550,10 @@ public class Chip8 {
         memory[i++] = (byte) 0x80;
         memory[i++] = (byte) 0x80;
 
+    }
+
+    public byte[] getMemory() {
+        return Arrays.copyOf(memory, memory.length);
     }
 
 }
