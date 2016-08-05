@@ -11,11 +11,11 @@ Chip-8 is a was created in the 1970s by Joseph Weisbecker to run games on the 8-
 
 This project focuses on implementing the Chip8 interpreter in a test driven manner.  You don't need any experience in writing emulators, but understanding Hexedecimal notation and binary operators are important.
 
-The master branch of this project is a stubbed out TDD project.  The "working" branch has my finished code.  
+The master branch of this project is a stubbed out TDD project.  The [working](https://github.com/secondsun/chip8/tree/working) branch has my finished project.  
 
 ## Prerequisites
 
-You need to have [Java 8](http://java.oracle.com) and [Maven](maven.apache.org) installed.  You can confirm it is working by running :
+You need to have [Java 8](http://java.oracle.com) and [Maven](http://maven.apache.org) installed.  You can confirm it is working by running :
 
 ```bash
 mvn clean install
