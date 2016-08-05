@@ -1,4 +1,4 @@
-package net.saga.console.chip8;
+package net.saga.console.chip8.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.saga.console.chip8.Chip8;
 
 public final class Chip8Utils {
 

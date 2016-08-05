@@ -1,4 +1,4 @@
-package net.saga.console.chip8;
+package net.saga.console.chip8.util;
 
 import java.util.HashMap;
 import java.util.Map;

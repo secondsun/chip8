@@ -1,4 +1,4 @@
-package net.saga.console.chip8;
+package net.saga.console.chip8.util;
 
 import java.util.function.IntSupplier;
 import javax.sound.sampled.AudioFormat;

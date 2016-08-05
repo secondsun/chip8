@@ -23,6 +23,8 @@
  */
 package net.saga.console.chip8;
 
+import net.saga.console.chip8.util.Chip8DisplayPanel;
+import net.saga.console.chip8.util.Chip8Utils;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
@@ -34,6 +36,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import net.saga.console.chip8.util.Input;
 
 /**
  *

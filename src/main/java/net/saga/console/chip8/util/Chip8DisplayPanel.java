@@ -21,11 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.saga.console.chip8;
+package net.saga.console.chip8.util;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import javax.swing.JPanel;
+import net.saga.console.chip8.Chip8;
 
 /**
  *

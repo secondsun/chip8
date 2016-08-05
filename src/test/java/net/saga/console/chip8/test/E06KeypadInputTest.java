@@ -2,8 +2,8 @@ package net.saga.console.chip8.test;
 
 import java.io.IOException;
 import net.saga.console.chip8.Chip8;
-import net.saga.console.chip8.Chip8Utils;
-import net.saga.console.chip8.Input;
+import net.saga.console.chip8.util.Chip8Utils;
+import net.saga.console.chip8.util.Input;
 import org.junit.After;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
