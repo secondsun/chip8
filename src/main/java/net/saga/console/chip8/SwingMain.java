@@ -23,6 +23,10 @@
  */
 package net.saga.console.chip8;
 
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
 import static java.lang.Thread.sleep;
@@ -35,7 +39,7 @@ import javax.swing.JOptionPane;
  *
  * @author summers
  */
-public class SwingMain extends javax.swing.JFrame {
+public class SwingMain extends javax.swing.JFrame implements KeyListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -61,6 +65,23 @@ public class SwingMain extends javax.swing.JFrame {
             }
         });
         initComponents();
+        KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        manager.addKeyEventDispatcher(new KeyEventDispatcher() {
+            @Override
+            public boolean dispatchKeyEvent(KeyEvent e) {
+                switch (e.getID()) {
+                    case KeyEvent.KEY_PRESSED:
+                        Input.press(e.getKeyChar());
+                        break;
+                    case KeyEvent.KEY_RELEASED:
+                        Input.unpress();
+                        break;
+                    default:
+                        break;
+                }
+                return false;
+            }
+        });
     }
 
     /**
@@ -75,13 +96,23 @@ public class SwingMain extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         openButton = new javax.swing.JButton();
         aboutButton = new javax.swing.JButton();
+        inputMapButton = new javax.swing.JButton();
         outputPanel = new Chip8DisplayPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(java.awt.Color.white);
         setMinimumSize(new java.awt.Dimension(286, 175));
+        addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                formKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                formKeyReleased(evt);
+            }
+        });
 
         jPanel1.setBackground(new java.awt.Color(51, 51, 255));
+        outputPanel.addKeyListener(SwingMain.this);
 
         openButton.setBackground(new java.awt.Color(102, 102, 255));
         openButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/open.png"))); // NOI18N
@@ -101,6 +132,14 @@ public class SwingMain extends javax.swing.JFrame {
             }
         });
 
+        inputMapButton.setBackground(new java.awt.Color(102, 102, 255));
+        inputMapButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/input.png"))); // NOI18N
+        inputMapButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                inputMapButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -110,19 +149,23 @@ public class SwingMain extends javax.swing.JFrame {
                 .addComponent(openButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(aboutButton)
-                .addContainerGap(492, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(inputMapButton, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(362, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(inputMapButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(aboutButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(openButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
         outputPanel.setMinimumSize(new java.awt.Dimension(64, 32));
+        outputPanel.addKeyListener(SwingMain.this);
 
         javax.swing.GroupLayout outputPanelLayout = new javax.swing.GroupLayout(outputPanel);
         outputPanel.setLayout(outputPanelLayout);
@@ -180,6 +223,18 @@ public class SwingMain extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(null, "Chip-8 in Java by secondsun.  \n github.com/secondsun/chip8");
     }//GEN-LAST:event_aboutButtonActionPerformed
 
+    private void inputMapButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inputMapButtonActionPerformed
+        new InputMapping().setVisible(true);
+    }//GEN-LAST:event_inputMapButtonActionPerformed
+
+    private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
+        Input.press(evt.getKeyChar());
+    }//GEN-LAST:event_formKeyPressed
+
+    private void formKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyReleased
+        Input.unpress();
+    }//GEN-LAST:event_formKeyReleased
+
     /**
      * @param args the command line arguments
      */
@@ -217,6 +272,7 @@ public class SwingMain extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton aboutButton;
+    private javax.swing.JButton inputMapButton;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JButton openButton;
     private javax.swing.JPanel outputPanel;
@@ -232,5 +288,19 @@ public class SwingMain extends javax.swing.JFrame {
 
     }
     private final Thread chip8Runner;
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        Input.press(e.getKeyChar());
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        Input.unpress();
+    }
 
 }

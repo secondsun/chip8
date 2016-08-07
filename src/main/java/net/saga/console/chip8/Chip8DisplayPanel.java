@@ -42,7 +42,7 @@ public class Chip8DisplayPanel extends JPanel {
         int width = super.getWidth();
         int height = super.getHeight();
         int pixelWidth = width / 64;
-        int pixelHeight = width / 32;
+        int pixelHeight = height / 32;
         byte[] video = chip8.getScreen();
         for (int x = 0; x < 64; x++) {
             for (int y = 0; y < 32; y++) {
