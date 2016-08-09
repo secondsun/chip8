@@ -318,7 +318,7 @@ public class Chip8 {
                     break;
                     case 5: {
                         registers[registerX] = registers[registerX] - registers[registerY];
-                        registers[0xf] = (registers[registerX]) >> 8 != 0 ? 1 : 0;
+                        registers[0xf] = (registers[registerX]) >> 8 != 0 ? 0 : 1;
                     }
                     break;
                     case 6: {
@@ -333,7 +333,7 @@ public class Chip8 {
                     break;
                     case 7: {
                         registers[registerX] = registers[registerY] - registers[registerX];
-                        registers[0xf] = (registers[registerX]) >> 8 != 0 ? 1 : 0;
+                        registers[0xf] = (registers[registerX]) >> 8 != 0 ? 0 : 1;
                     }
                     break;
                     default:
@@ -554,6 +554,10 @@ public class Chip8 {
 
     public byte[] getMemory() {
         return Arrays.copyOf(memory, memory.length);
+    }
+
+    public int getSP() {
+        return sp;
     }
 
 }
