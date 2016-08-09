@@ -32,6 +32,8 @@ public class E07GraphicsTest {
         this.chip8.execute(0x64FF);
         this.chip8.execute(0x65B4);
         this.chip8.execute(0x6642);
+        this.chip8.execute(0x673F);
+        this.chip8.execute(0x681F);
         this.chip8.execute(0x6F25);
     }
 
@@ -149,6 +151,19 @@ public class E07GraphicsTest {
 
     }
 
+    /**
+     * Sprites wrap around on their axis. IE If you draw to X 65 it will wrap to
+     * position 1.
+     */
+    @Test
+    public void drawSpriteBottomRightEdgeTests() {
+        chip8.execute(0xA202);
+        chip8.execute(0xD781); 
+        chip8.execute(0xD871); 
+        chip8.execute(0xD781); 
+        chip8.execute(0xD871); 
+    }
+    
     /**
      * The opcode 00E0 clears the screen.
      *

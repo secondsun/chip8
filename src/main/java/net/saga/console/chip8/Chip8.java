@@ -355,10 +355,10 @@ public class Chip8 {
                 int x = registers[registerX];
                 int y = registers[registerY];
                 registers[0xF] = 0;
-                for (int count = 0; count < lines; count++) {
-                    long oldVideo = getSpriteRow(x, y + count);
+                for (int count = 0; (count < lines) ; count++) {
+                    byte oldVideo = getSpriteRow(x, y + count);
                     writeVideo(x, y + count, memory[iRegister + count]);
-                    registers[0xF] = (memory[iRegister + count] & oldVideo) == 0 ? 0 : 1;
+                    registers[0xF] = (((byte)memory[iRegister + count] & oldVideo)) == 0 ? ((byte)registers[0xF]) : 1;
                 }
 
             }
@@ -412,13 +412,13 @@ public class Chip8 {
         x = x % 64;
         y = y % 32;
         byte byte1 = video[x + y * 64];
-        byte byte2 = video[x + 1 + y * 64];
-        byte byte3 = video[x + 2 + y * 64];
-        byte byte4 = video[x + 3 + y * 64];
-        byte byte5 = video[x + 4 + y * 64];
-        byte byte6 = video[x + 5 + y * 64];
-        byte byte7 = video[x + 6 + y * 64];
-        byte byte8 = video[x + 7 + y * 64];
+        byte byte2 = video[(x + 1) % 64 + y * 64];
+        byte byte3 = video[(x + 2) % 64 + y * 64];
+        byte byte4 = video[(x + 3) % 64 + y * 64];
+        byte byte5 = video[(x + 4) % 64 + y * 64];
+        byte byte6 = video[(x + 5) % 64 + y * 64];
+        byte byte7 = video[(x + 6) % 64 + y * 64];
+        byte byte8 = video[(x + 7) % 64 + y * 64];
 
         return (byte) ((byte1 << 7)
                 | (byte2 << 6)
@@ -435,13 +435,13 @@ public class Chip8 {
         x = x % 64;
         y = y % 32;
         video[(x) + (y) * 64] ^= (byte) ((b & 0b10000000) >> 7);
-        video[1 + (x) + (y) * 64] ^= (byte) ((b & 0b01000000) >> 6);
-        video[2 + (x) + (y) * 64] ^= (byte) ((b & 0b00100000) >> 5);
-        video[3 + (x) + (y) * 64] ^= (byte) ((b & 0b00010000) >> 4);
-        video[4 + (x) + (y) * 64] ^= (byte) ((b & 0b00001000) >> 3);
-        video[5 + (x) + (y) * 64] ^= (byte) ((b & 0b00000100) >> 2);
-        video[6 + (x) + (y) * 64] ^= (byte) ((b & 0b00000010) >> 1);
-        video[7 + (x) + (y) * 64] ^= (byte) ((b & 0b00000001));
+        video[(1 + (x)) % 64 + (y) * 64] ^= (byte) ((b & 0b01000000) >> 6);
+        video[(2 + (x)) % 64 + (y) * 64] ^= (byte) ((b & 0b00100000) >> 5);
+        video[(3 + (x)) % 64  + (y) * 64] ^= (byte) ((b & 0b00010000) >> 4);
+        video[(4 + (x)) % 64  + (y) * 64] ^= (byte) ((b & 0b00001000) >> 3);
+        video[(5 + (x)) % 64  + (y) * 64] ^= (byte) ((b & 0b00000100) >> 2);
+        video[(6 + (x)) % 64  + (y) * 64] ^= (byte) ((b & 0b00000010) >> 1);
+        video[(7 + (x)) % 64  + (y) * 64] ^= (byte) ((b & 0b00000001));
     }
 
     private int getCharacterAddress(int digit) {
