@@ -234,12 +234,12 @@ public class E01ArithmeticOpCodeTest {
      *
      * would store 84 into register VB and 25 into VD. Then VD would be set to
      * (25 - 84) which would underflow to xxx. Additionally VF would be set to
-     * 0x01 to indicate the borrow.
+     * 0x00 to indicate the borrow.
      *
      * IE 0x6B84 0x6D25 0x8DB7
      *
      * would store 84 into register VB and 25 into VD. Then VD would be set to
-     * (84 - 25) which would be 59. Additionally VF would be set to 0x00 to
+     * (84 - 25) which would be 59. Additionally VF would be set to 0x01 to
      * indicate there was no borrow.
      *
      */
@@ -252,7 +252,7 @@ public class E01ArithmeticOpCodeTest {
 
         Assert.assertEquals(0x84, chip8.getVB());
         Assert.assertEquals(161, chip8.getVD());
-        Assert.assertEquals(0x01, chip8.getVF());
+        Assert.assertEquals(0x00, chip8.getVF());
 
         chip8.execute(0x6B84);
         chip8.execute(0x6F84);
@@ -261,7 +261,7 @@ public class E01ArithmeticOpCodeTest {
 
         Assert.assertEquals(0x84, chip8.getVB());
         Assert.assertEquals(95, chip8.getVD());
-        Assert.assertEquals(0x00, chip8.getVF());
+        Assert.assertEquals(0x01, chip8.getVF());
 
     }
 
