@@ -145,7 +145,7 @@ public class Chip8 {
             case 0x3000: {//3XNN Skip if Vx = NN
                 int low = 0x0FF & instruction;
                 int register = (instruction & 0x0f00) >> 8;
-                if (registers[register] == low) {
+                if ((0xFF & registers[register]) == low) {
                     pc += 0x2;
                 }
             }
@@ -299,25 +299,25 @@ public class Chip8 {
                     }
                     break;
                     case 1: {
-                        registers[registerX] |= registers[registerY];
+                        registers[registerX] |= (0xFF & registers[registerY]);
                     }
                     break;
 
                     case 2: {
-                        registers[registerX] &= registers[registerY];
+                        registers[registerX] &= (0xFF & registers[registerY]);
                     }
                     break;
                     case 3: {
-                        registers[registerX] ^= registers[registerY];
+                        registers[registerX] ^= (0xFF & registers[registerY]);
                     }
                     break;
                     case 4: {
-                        registers[registerX] += registers[registerY];
+                        registers[registerX] += (0xFF & registers[registerY]);
                         registers[0xf] = (registers[registerX]) >> 8 != 0 ? 1 : 0;
                     }
                     break;
                     case 5: {
-                        registers[registerX] = registers[registerX] - registers[registerY];
+                        registers[registerX] = (0xFF & registers[registerX]) - (0xFF & registers[registerY]);
                         registers[0xf] = (registers[registerX]) >> 8 != 0 ? 0 : 1;
                     }
                     break;
