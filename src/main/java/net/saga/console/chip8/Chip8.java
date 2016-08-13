@@ -60,6 +60,14 @@ public class Chip8 {
         return pc;
     }
 
+    private void setVX(int value, int register) {
+         registers[register] = (0x000000FF & value);
+    }
+
+    private int getVX(int x) {
+         return 0x000000FF & registers[x];
+    }
+    
     public int getV0() {
         return registers[0] & 0xFF;
     }
@@ -145,7 +153,7 @@ public class Chip8 {
             case 0x3000: {//3XNN Skip if Vx = NN
                 int low = 0x0FF & instruction;
                 int register = (instruction & 0x0f00) >> 8;
-                if ((0xFF & registers[register]) == low) {
+                if ((getVX(register)) == low) {
                     pc += 0x2;
                 }
             }
@@ -153,7 +161,7 @@ public class Chip8 {
             case 0x5000: {//5XY0 Skip if Vx = Vy
                 int registery = (instruction & 0x00f0) >> 4;
                 int registerx = (instruction & 0x0f00) >> 8;
-                if (registers[registerx] == registers[registery]) {
+                if (getVX(registerx) == getVX(registery)) {
                     pc += 0x2;
                 }
             }
@@ -161,7 +169,7 @@ public class Chip8 {
             case 0x4000: {//$XNN Skip if Vx != NN
                 int low = 0x0FF & instruction;
                 int register = (instruction & 0x0f00) >> 8;
-                if (registers[register] != low) {
+                if (getVX(register) != low) {
                     pc += 0x2;
                 }
             }
@@ -169,7 +177,7 @@ public class Chip8 {
             case 0x9000: {//9XY0 Skip if Vx != Vy
                 int registery = (instruction & 0x00f0) >> 4;
                 int registerx = (instruction & 0x0f00) >> 8;
-                if (registers[registerx] != registers[registery]) {
+                if (getVX(registerx) != getVX(registery)) {
                     pc += 0x2;
                 }
             }
@@ -194,46 +202,46 @@ public class Chip8 {
 
                 switch (low) {
                     case 0x15:
-                        delayTimer = registers[register];
+                        delayTimer = getVX(register);
                         break;
                     case 0x65: {
                         byte maxRegister = (byte) register;
                         for (int i = 0; i <= maxRegister; i++) {
-                            registers[i] = memory[iRegister];
+                            setVX(memory[iRegister], i);
                             iRegister++;
                         }
                         }break;
                     case 0x55:
                         byte maxRegister = (byte) register;
                         for (int i = 0; i <= maxRegister; i++) {
-                            memory[iRegister] = (byte) registers[i];
+                            memory[iRegister] = (byte) getVX(i);
                             iRegister++;
                         }
                         break;
                     case 0x18:
-                        soundTimer = registers[register];
+                        soundTimer = getVX(register);
                         break;
                     case 0x0A:
-                        if (Input.read() == 0) {
+                        if (Input.read() == -1) {
                             pc -= 0x2;
                         } else {
-                            registers[register] = Input.read();
+                            setVX(Input.read(), register);
                         }
                         break;
                     case 0x07:
-                        registers[register] = delayTimer;
+                        setVX(delayTimer, register);
                         break;
                     case 0x29:
-                        iRegister = getCharacterAddress(registers[register]);
+                        iRegister = getCharacterAddress(getVX(register));
                         break;
                     case 0x33:
-                        int value = registers[register];
+                        int value = getVX(register);
                         memory[iRegister] = (byte) (value / 100);
                         memory[iRegister + 1] = (byte) (((value) % 100) / 10);
                         memory[iRegister + 2] = (byte) (((value) % 100) % 10);
                         break;
                     case 0x1E:
-                        iRegister += registers[register];
+                        iRegister += getVX(register);
                         break;
                     default:
                         throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(instruction));
@@ -243,26 +251,26 @@ public class Chip8 {
 
             case 0xB000: {//BNNN Jump to NNN + V0
                 int low = 0x0FFF & instruction;
-                pc = low + registers[0];
+                pc = low + getVX(0);
 
             }
             break;
             case 0x6000: {//6XNN	Store number NN in register VX
                 int low = 0x0FF & instruction;
                 int register = (instruction & 0x0f00) >> 8;
-                registers[register] = low;
+                setVX(low, register);
             }
             break;
             case 0x7000: { //7XNN	Adds number NN to register VX
                 int low = 0x0FF & instruction;
                 int register = (instruction & 0x0f00) >> 8;
-                registers[register] += low;
+                setVX(getVX(register) + low, register);
             }
             break;
             case 0xC000: { //7XNN	Mask a random and  number NN to register VX
                 int low = 0x0FF & instruction;
                 int register = (instruction & 0x0f00) >> 8;
-                registers[register] = random.nextInt(0xFF) & low;
+                setVX(random.nextInt(0xFF) & low, register);
             }
             break;
             case 0xE000: { //EXop Skips based on keyboard input
@@ -272,13 +280,13 @@ public class Chip8 {
                 switch (low) {
                     case 0x9E:
                         //skip if register == input
-                        if (registers[register] == Input.read()) {
+                        if (getVX(register) == Input.read()) {
                             pc += 0x2;
                         }
                         break;
                     case 0xA1:
                         //skip if register != input
-                        if (registers[register] != Input.read()) {
+                        if (getVX(register) != Input.read()) {
                             pc += 0x2;
                         }
                         break;
@@ -295,45 +303,49 @@ public class Chip8 {
 
                 switch (low) {
                     case 0: {
-                        registers[registerX] = registers[registerY];
+                        setVX(getVX(registerY), registerX);
                     }
                     break;
                     case 1: {
-                        registers[registerX] |= (0xFF & registers[registerY]);
+                        setVX(getVX(registerY) | getVX(registerX), registerX);
                     }
                     break;
 
                     case 2: {
-                        registers[registerX] &= (0xFF & registers[registerY]);
+                        setVX(getVX(registerY) & getVX(registerX), registerX);
                     }
                     break;
                     case 3: {
-                        registers[registerX] ^= (0xFF & registers[registerY]);
+                        setVX(getVX(registerY) ^ getVX(registerX), registerX);
                     }
                     break;
                     case 4: {
-                        registers[registerX] += (0xFF & registers[registerY]);
-                        registers[0xf] = (registers[registerX]) >> 8 != 0 ? 1 : 0;
+                        int sum = getVX(registerX) + getVX(registerY);
+                        registers[0xf] = sum > 0xFF?1:0;
+                        setVX(sum, registerX);                        
                     }
                     break;
                     case 5: {
-                        registers[registerX] = (0xFF & registers[registerX]) - (0xFF & registers[registerY]);
-                        registers[0xf] = (registers[registerX]) >> 8 != 0 ? 0 : 1;
+                        int difference = getVX(registerX) - getVX(registerY);
+                        registers[0xf] = difference > 0 ? 1 : 0;
+                        setVX(difference, registerX);                        
+                        
                     }
                     break;
                     case 6: {
-                        registers[0xf] = registers[registerY] & 0x1;
-                        registers[registerX] = registers[registerY] >> 1;
+                        registers[0xf] = getVX(registerX) & 0x01;
+                        setVX(getVX(registerX) >> 1, registerX);
                     }
                     break;
                     case 0xE: {
-                        registers[0xf] = (registers[registerY]) >> 7;
-                        registers[registerX] = registers[registerY] << 1;
+                        registers[0xf] = (getVX(registerX) >> 7) & 0x01;
+                        setVX(getVX(registerX) << 1, registerX);
                     }
                     break;
                     case 7: {
-                        registers[registerX] = registers[registerY] - registers[registerX];
-                        registers[0xf] = (registers[registerX]) >> 8 != 0 ? 0 : 1;
+                        int difference = getVX(registerY) - getVX(registerX);
+                        registers[0xf] = difference > 0 ? 1 : 0;
+                        setVX(difference, registerX);           
                     }
                     break;
                     default:
@@ -352,8 +364,8 @@ public class Chip8 {
                 int registerX = (instruction & 0x0F00) >> 8;
                 int registerY = (instruction & 0x00F0) >> 4;
 
-                int x = registers[registerX];
-                int y = registers[registerY];
+                int x = getVX(registerX);
+                int y = getVX(registerY);
                 registers[0xF] = 0;
                 for (int count = 0; (count < lines) ; count++) {
                     byte oldVideo = getSpriteRow(x, y + count);
@@ -445,7 +457,7 @@ public class Chip8 {
     }
 
     private int getCharacterAddress(int digit) {
-        if (digit > 0xf) {
+        if (((0xff)&digit) > 0xf) {
             throw new IllegalArgumentException(digit + " is not a vlaid character");
         }
         return 5 * digit;
