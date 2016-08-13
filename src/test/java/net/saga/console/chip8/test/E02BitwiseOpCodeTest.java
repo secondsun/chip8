@@ -117,17 +117,17 @@ public class E02BitwiseOpCodeTest {
     }
 
     /**
-     * 8XY6	Shift VY Right one place and store the result in VX. Also store the
+     * 8XY6	Shift VX Right one place and store the result in VX. Also store the
      * lest significant bit in VF
      */
     @Test
     public void testShiftRight() {
         chip8.execute(0x8016); // v0 = 0x27 >> 1; xF = 0x1
-        assertEquals(19, chip8.getV0());
-        assertEquals(0x1, chip8.getVF());
+        assertEquals(0x32, chip8.getV0());
+        assertEquals(0x0, chip8.getVF());
 
         chip8.execute(0x8236); // v2 = 0xAE >> 1; VF = 0x0
-        assertEquals(87, chip8.getV2());
+        assertEquals(0x09, chip8.getV2());
         assertEquals(0x0, chip8.getVF());
 
         chip8.execute(0x8446); // V4 = 0xFF >> 1; VF = 0x1;
@@ -137,18 +137,18 @@ public class E02BitwiseOpCodeTest {
     }
 
     /**
-     * 8XYE	Shift VY left one place and store the result in VX. Also store the
+     * 8XYE	Shift VX left one place and store the result in VX. Also store the
      * most significant bit in VF
      */
     @Test
     public void testShiftLeft() {
         chip8.execute(0x801E); // v0 = 0x27 << 1; xF = 0x1
-        assertEquals(78, chip8.getV0());
+        assertEquals(200, chip8.getV0());
         assertEquals(0x0, chip8.getVF());
 
         chip8.execute(0x823E); // v2 = 0xAE << 1; VF = 0x0
-        assertEquals(92, chip8.getV2());
-        assertEquals(0x1, chip8.getVF());
+        assertEquals(36, chip8.getV2());
+        assertEquals(0x0, chip8.getVF());
 
         chip8.execute(0x844E); // V4 = 0xFF << 1; VF = 0x1;
         assertEquals(254, chip8.getV4());
