@@ -523,7 +523,7 @@ public class Chip8 {
         memory[i++] = (byte) 0xF0;
         memory[i++] = (byte) 0x90;
         memory[i++] = (byte) 0xF0;
-        memory[i++] = (byte) 0x90;
+        memory[i++] = (byte) 0x10;
         memory[i++] = (byte) 0xF0;
 
         memory[i++] = (byte) 0xF0;
