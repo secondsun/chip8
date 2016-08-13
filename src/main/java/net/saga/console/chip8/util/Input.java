@@ -27,7 +27,7 @@ public final class Input {
 
     }
 
-    static void map(int i, String text) {
+    public static void map(int i, String text) {
         if (text != null && !text.isEmpty()) {
             keyMap.put(text.toLowerCase(), i);
         }
