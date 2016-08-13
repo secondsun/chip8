@@ -282,7 +282,7 @@ public class E07GraphicsTest {
                 assertEquals((byte)0xF0, Chip8Utils.getSpriteRow(0, 0, video));
                 assertEquals((byte)0x90, Chip8Utils.getSpriteRow(0, 1, video));
                 assertEquals((byte)0xF0, Chip8Utils.getSpriteRow(0, 2, video));
-                assertEquals((byte)0x90, Chip8Utils.getSpriteRow(0, 3, video));
+                assertEquals((byte)0x10, Chip8Utils.getSpriteRow(0, 3, video));
                 assertEquals((byte)0xF0, Chip8Utils.getSpriteRow(0, 4, video));
                 break;
             case 0xA:
