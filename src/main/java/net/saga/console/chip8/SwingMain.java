@@ -60,7 +60,7 @@ public class SwingMain extends javax.swing.JFrame implements KeyListener {
                         if (pause == false || step) {
                             step = false;
                             chip8.cycle();
-                            ((Chip8Model)jTable1.getModel()).update(chip8);
+                            ((Chip8Model) jTable1.getModel()).update(chip8);
                         }
                         outputPanel.repaint();
                     }
@@ -77,7 +77,7 @@ public class SwingMain extends javax.swing.JFrame implements KeyListener {
             public boolean dispatchKeyEvent(KeyEvent e) {
                 switch (e.getID()) {
                     case KeyEvent.KEY_PRESSED:
-                        Input.press(e.getKeyChar());
+                        Input.press(e.getKeyChar() + "");
                         break;
                     case KeyEvent.KEY_RELEASED:
                         Input.unpress();
@@ -356,12 +356,29 @@ public class SwingMain extends javax.swing.JFrame implements KeyListener {
         Chip8DisplayPanel panel = (Chip8DisplayPanel) outputPanel;
         panel.setChip8(chip8);
         if (!chip8Runner.isAlive()) {
+            this.chip8Runner = new Thread(() -> {
+                while (true) {
+                    try {
+                        if (running) {
+                            if (pause == false || step) {
+                                step = false;
+                                chip8.cycle();
+                                ((Chip8Model) jTable1.getModel()).update(chip8);
+                            }
+                            outputPanel.repaint();
+                        }
+                        sleep(1);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(SwingMain.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            });
             chip8Runner.start();
         }
         running = true;
 
     }
-    private final Thread chip8Runner;
+    private Thread chip8Runner;
 
     @Override
     public void keyTyped(KeyEvent e) {

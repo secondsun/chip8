@@ -36,16 +36,16 @@ public final class Input {
     private Input() {
     }
 
-    private static int KEYS = 0;
+    private static int KEYS = -1;
 
     public static void press(int i) {
-        KEYS = 0xF & i;
+        KEYS = 0x0000000F & i;
     }
 
     public static void press(String input) {
         input = input.toLowerCase();
         if (keyMap.containsKey(input)) {
-            KEYS = 0xF & keyMap.get(input);
+            KEYS = 0x0000000F & keyMap.get(input);
         }
 
     }
@@ -54,12 +54,12 @@ public final class Input {
         input = input.toLowerCase();
 
         if (keyMap.containsKey(input)) {
-            KEYS = 0;
+            KEYS = -1;
         }
     }
 
     public static void unpress() {
-        KEYS = 0;
+        KEYS = -1;
     }
 
     /**
