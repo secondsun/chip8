@@ -26,6 +26,7 @@ package net.saga.console.chip8;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
+import net.saga.console.chip8.util.Input;
 
 /**
  *
