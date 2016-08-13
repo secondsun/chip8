@@ -43,7 +43,7 @@ The project is broken up into eight sections :
  - 07 [Graphics](src/test/java/net/saga/console/chip8/test/E07GraphicsTest.java)
  - 08 [Utilities](src/test/java/net/saga/console/chip8/test/E08UtilitiesTest.java)
 
-Additionally you may want to review other documents on CHIP8 from the web.  My reference for writing this project was [Mastering CHIP-8 by Matthew Mikolay](http://mattmik.com/files/chip8/mastering/chip8.html).
+Additionally you may want to review other documents on CHIP8 from the web.  My reference for writing this project was [Mastering CHIP-8 by Matthew Mikolay](http://mattmik.com/files/chip8/mastering/chip8.html) and the [CHIP-8 Wikipedia article](https://en.wikipedia.org/wiki/CHIP-8).
 
 # Exec
 
