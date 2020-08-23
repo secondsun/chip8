@@ -5,12 +5,14 @@
  */
 package net.saga.console.chip8.test;
 
-import java.io.IOException;
 import net.saga.console.chip8.Chip8;
 import net.saga.console.chip8.util.Chip8Utils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  *
@@ -34,7 +36,7 @@ public class E03ClockExecutionAndMemoryTest {
      *
      * @throws java.io.IOException
      */
-    @Before
+    @BeforeEach
     public void loadMemory() throws IOException {
         this.chip8 = Chip8Utils.createFromRom(E03ClockExecutionAndMemoryTest.class.getResource("/E03TestRom.ch8"));
     }
@@ -61,10 +63,10 @@ public class E03ClockExecutionAndMemoryTest {
         chip8.cycle();
         chip8.cycle();
         chip8.cycle();
-        Assert.assertEquals(0x15, chip8.getV0());
-        Assert.assertEquals(0x20, chip8.getV1());
-        Assert.assertEquals(0x25, chip8.getV2());
-        Assert.assertEquals(0x30, chip8.getV3());
-        Assert.assertEquals(0x208, chip8.getPC());
+        assertEquals(0x15, chip8.getV0());
+        assertEquals(0x20, chip8.getV1());
+        assertEquals(0x25, chip8.getV2());
+        assertEquals(0x30, chip8.getV3());
+        assertEquals(0x208, chip8.getPC());
     }
 }

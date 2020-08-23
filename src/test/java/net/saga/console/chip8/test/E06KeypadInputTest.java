@@ -4,10 +4,12 @@ import java.io.IOException;
 import net.saga.console.chip8.Chip8;
 import net.saga.console.chip8.util.Chip8Utils;
 import net.saga.console.chip8.util.Input;
-import org.junit.After;
-import static org.junit.Assert.assertEquals;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  *
@@ -19,7 +21,7 @@ public class E06KeypadInputTest {
 
     private Chip8 chip8;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         this.chip8 = Chip8Utils.createFromRom(getClass().getResource("/E06KeypadLoop.ch8"));
         this.chip8.execute(0x6064);
@@ -32,7 +34,7 @@ public class E06KeypadInputTest {
         this.chip8.execute(0x6F25);
     }
     
-    @After
+    @AfterEach
     public void unpress() {
         Input.unpress();
     }

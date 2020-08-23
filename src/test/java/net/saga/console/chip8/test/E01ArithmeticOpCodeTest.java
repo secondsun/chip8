@@ -1,12 +1,9 @@
 package net.saga.console.chip8.test;
 
 import net.saga.console.chip8.Chip8;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  *
@@ -23,20 +20,20 @@ public class E01ArithmeticOpCodeTest {
     public E01ArithmeticOpCodeTest() {
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.chip8 = new Chip8();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
     }
 
@@ -46,7 +43,7 @@ public class E01ArithmeticOpCodeTest {
      */
     @Test
     public void testPCInitializedto0x200() {
-        Assert.assertEquals(0x0200, chip8.getPC());
+        assertEquals(0x0200, chip8.getPC());
     }
 
     /**
@@ -58,22 +55,22 @@ public class E01ArithmeticOpCodeTest {
      */
     @Test
     public void testDataRegistersInitializedTo0() {
-        Assert.assertEquals(0x0, chip8.getV0());//Test initialized to 0
-        Assert.assertEquals(0x0, chip8.getV1());//Test initialized to 0
-        Assert.assertEquals(0x0, chip8.getV2());//Test initialized to 0
-        Assert.assertEquals(0x0, chip8.getV3());//Test initialized to 0
-        Assert.assertEquals(0x0, chip8.getV4());//Test initialized to 0
-        Assert.assertEquals(0x0, chip8.getV5());//Test initialized to 0
-        Assert.assertEquals(0x0, chip8.getV6());//Test initialized to 0
-        Assert.assertEquals(0x0, chip8.getV7());//Test initialized to 0
-        Assert.assertEquals(0x0, chip8.getV8());//Test initialized to 0
-        Assert.assertEquals(0x0, chip8.getV9());//Test initialized to 0
-        Assert.assertEquals(0x0, chip8.getVA());//Test initialized to 0
-        Assert.assertEquals(0x0, chip8.getVB());//Test initialized to 0
-        Assert.assertEquals(0x0, chip8.getVC());//Test initialized to 0
-        Assert.assertEquals(0x0, chip8.getVD());//Test initialized to 0
-        Assert.assertEquals(0x0, chip8.getVE());//Test initialized to 0
-        Assert.assertEquals(0x0, chip8.getVF());//Test initialized to 0
+        assertEquals(0x0, chip8.getV0());//Test initialized to 0
+        assertEquals(0x0, chip8.getV1());//Test initialized to 0
+        assertEquals(0x0, chip8.getV2());//Test initialized to 0
+        assertEquals(0x0, chip8.getV3());//Test initialized to 0
+        assertEquals(0x0, chip8.getV4());//Test initialized to 0
+        assertEquals(0x0, chip8.getV5());//Test initialized to 0
+        assertEquals(0x0, chip8.getV6());//Test initialized to 0
+        assertEquals(0x0, chip8.getV7());//Test initialized to 0
+        assertEquals(0x0, chip8.getV8());//Test initialized to 0
+        assertEquals(0x0, chip8.getV9());//Test initialized to 0
+        assertEquals(0x0, chip8.getVA());//Test initialized to 0
+        assertEquals(0x0, chip8.getVB());//Test initialized to 0
+        assertEquals(0x0, chip8.getVC());//Test initialized to 0
+        assertEquals(0x0, chip8.getVD());//Test initialized to 0
+        assertEquals(0x0, chip8.getVE());//Test initialized to 0
+        assertEquals(0x0, chip8.getVF());//Test initialized to 0
     }
 
     /**
@@ -88,52 +85,52 @@ public class E01ArithmeticOpCodeTest {
     @Test
     public void testLoadConstant() {
         chip8.execute(0x6015);
-        Assert.assertEquals(0x15, chip8.getV0());//Test loads 15 to V0
+        assertEquals(0x15, chip8.getV0());//Test loads 15 to V0
 
         chip8.execute(0x6120);
-        Assert.assertEquals(0x20, chip8.getV1());//etc
+        assertEquals(0x20, chip8.getV1());//etc
 
         chip8.execute(0x6225);
-        Assert.assertEquals(0x25, chip8.getV2());
+        assertEquals(0x25, chip8.getV2());
 
         chip8.execute(0x6330);
-        Assert.assertEquals(0x30, chip8.getV3());
+        assertEquals(0x30, chip8.getV3());
 
         chip8.execute(0x6435);
-        Assert.assertEquals(0x35, chip8.getV4());
+        assertEquals(0x35, chip8.getV4());
 
         chip8.execute(0x6540);
-        Assert.assertEquals(0x40, chip8.getV5());
+        assertEquals(0x40, chip8.getV5());
 
         chip8.execute(0x6645);
-        Assert.assertEquals(0x45, chip8.getV6());
+        assertEquals(0x45, chip8.getV6());
 
         chip8.execute(0x6750);
-        Assert.assertEquals(0x50, chip8.getV7());
+        assertEquals(0x50, chip8.getV7());
 
         chip8.execute(0x6855);
-        Assert.assertEquals(0x55, chip8.getV8());
+        assertEquals(0x55, chip8.getV8());
 
         chip8.execute(0x6960);
-        Assert.assertEquals(0x60, chip8.getV9());
+        assertEquals(0x60, chip8.getV9());
 
         chip8.execute(0x6A65);
-        Assert.assertEquals(0x65, chip8.getVA());
+        assertEquals(0x65, chip8.getVA());
 
         chip8.execute(0x6B70);
-        Assert.assertEquals(0x70, chip8.getVB());
+        assertEquals(0x70, chip8.getVB());
 
         chip8.execute(0x6C75);
-        Assert.assertEquals(0x75, chip8.getVC());
+        assertEquals(0x75, chip8.getVC());
 
         chip8.execute(0x6D80);
-        Assert.assertEquals(0x80, chip8.getVD());
+        assertEquals(0x80, chip8.getVD());
 
         chip8.execute(0x6E85);
-        Assert.assertEquals(0x85, chip8.getVE());
+        assertEquals(0x85, chip8.getVE());
 
         chip8.execute(0x6F90);
-        Assert.assertEquals(0x90, chip8.getVF());
+        assertEquals(0x90, chip8.getVF());
     }
 
     /**
@@ -153,15 +150,15 @@ public class E01ArithmeticOpCodeTest {
     public void testAddConstant() {
         chip8.execute(0x6015);
         chip8.execute(0x7015);
-        Assert.assertEquals(0x2A, chip8.getV0());
+        assertEquals(0x2A, chip8.getV0());
 
         chip8.execute(0x6A42);
         chip8.execute(0x7A42);
-        Assert.assertEquals(0x84, chip8.getVA());//Test loads 15 to V0
+        assertEquals(0x84, chip8.getVA());//Test loads 15 to V0
 
         chip8.execute(0x6EFF);
         chip8.execute(0x7E01);
-        Assert.assertEquals(0x0, chip8.getVE());//Test Overflow
+        assertEquals(0x0, chip8.getVE());//Test Overflow
 
     }
 
@@ -180,13 +177,13 @@ public class E01ArithmeticOpCodeTest {
     public void testCopyRegister() {
         chip8.execute(0x6A42);
         chip8.execute(0x8EA0);
-        Assert.assertEquals(0x42, chip8.getVA());
-        Assert.assertEquals(0x42, chip8.getVE());
+        assertEquals(0x42, chip8.getVA());
+        assertEquals(0x42, chip8.getVE());
 
         chip8.execute(0x6ADE);
         chip8.execute(0x8FA0);
-        Assert.assertEquals(0x42, chip8.getVE());
-        Assert.assertEquals(0xDE, chip8.getVF());
+        assertEquals(0x42, chip8.getVE());
+        assertEquals(0xDE, chip8.getVF());
 
     }
 
@@ -209,17 +206,17 @@ public class E01ArithmeticOpCodeTest {
         chip8.execute(0x6E42);
         chip8.execute(0x8FA0);
         chip8.execute(0x8EA4);
-        Assert.assertEquals(0x42, chip8.getVA());
-        Assert.assertEquals(0x84, chip8.getVE());
-        Assert.assertEquals(0x00, chip8.getVF());
+        assertEquals(0x42, chip8.getVA());
+        assertEquals(0x84, chip8.getVE());
+        assertEquals(0x00, chip8.getVF());
 
         chip8.execute(0x6AF0);
         chip8.execute(0x6E42);
         chip8.execute(0x8FA0);
         chip8.execute(0x8EA4);
-        Assert.assertEquals(0xF0, chip8.getVA());
-        Assert.assertEquals(0x32, chip8.getVE());
-        Assert.assertEquals(0x01, chip8.getVF());
+        assertEquals(0xF0, chip8.getVA());
+        assertEquals(0x32, chip8.getVE());
+        assertEquals(0x01, chip8.getVF());
 
     }
 
@@ -250,18 +247,18 @@ public class E01ArithmeticOpCodeTest {
         chip8.execute(0x6D25); // Set Register D to 0x25
         chip8.execute(0x8DB5); // Set Register D to  0x25 - 0x84.  This underflows and forces a carry
 
-        Assert.assertEquals(0x84, chip8.getVB());
-        Assert.assertEquals(161, chip8.getVD());
-        Assert.assertEquals(0x00, chip8.getVF());
+        assertEquals(0x84, chip8.getVB());
+        assertEquals(161, chip8.getVD());
+        assertEquals(0x00, chip8.getVF());
 
         chip8.execute(0x6B84);
         chip8.execute(0x6F84);
         chip8.execute(0x6D25);
         chip8.execute(0x8DB7);
 
-        Assert.assertEquals(0x84, chip8.getVB());
-        Assert.assertEquals(95, chip8.getVD());
-        Assert.assertEquals(0x01, chip8.getVF());
+        assertEquals(0x84, chip8.getVB());
+        assertEquals(95, chip8.getVD());
+        assertEquals(0x01, chip8.getVF());
 
     }
 

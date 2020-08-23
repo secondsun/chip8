@@ -24,9 +24,10 @@
 package net.saga.console.chip8.test;
 
 import net.saga.console.chip8.Chip8;
-import static org.junit.Assert.assertEquals;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  *
@@ -36,7 +37,7 @@ public class E08UtilitiesTest {
 
     private Chip8 chip8;
  
-    @Before
+    @BeforeEach
     public void setup() {
         this.chip8 = new Chip8();
         this.chip8.execute(0x6064);

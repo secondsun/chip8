@@ -1,12 +1,10 @@
 package net.saga.console.chip8.test;
 
 import net.saga.console.chip8.Chip8;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This test suite will work with flow control op codes. They will adjust the
@@ -21,15 +19,7 @@ public class E04FlowControlTest {
     public E04FlowControlTest() {
     }
 
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
+    @BeforeEach
     public void setUp() {
         this.chip8 = new Chip8();
         this.chip8.execute(0x6064);
@@ -42,9 +32,7 @@ public class E04FlowControlTest {
         this.chip8.execute(0x6F25);
     }
 
-    @After
-    public void tearDown() {
-    }
+
 
     /**
      * Jump instructions are the most basic flow control. They simply tell the

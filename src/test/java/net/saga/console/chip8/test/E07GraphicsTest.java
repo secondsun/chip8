@@ -1,11 +1,13 @@
 package net.saga.console.chip8.test;
 
-import java.io.IOException;
 import net.saga.console.chip8.Chip8;
 import net.saga.console.chip8.util.Chip8Utils;
-import static org.junit.Assert.assertEquals;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This last test class covers graphics. There are three main parts of graphics
@@ -15,7 +17,7 @@ public class E07GraphicsTest {
 
     private Chip8 chip8;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         //Graphics ROM has the sprite FF3C stored starting at 202
         // This is the following two row sprite

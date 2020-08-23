@@ -1,12 +1,16 @@
 package net.saga.console.chip8.test;
 
-import java.io.IOException;
 import net.saga.console.chip8.Chip8;
 import net.saga.console.chip8.util.Chip8Utils;
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
-import org.junit.Ignore;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  *
@@ -16,7 +20,7 @@ public class E05TimersTest {
 
     private Chip8 chip8;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         this.chip8 = Chip8Utils.createFromRom(getClass().getResource("/E05TimerLoop.ch8"));
         this.chip8.execute(0x6064);
@@ -49,7 +53,8 @@ public class E05TimersTest {
 
     }
 
-    @Test(timeout = 500l)
+    @Test
+    @Timeout(value = 500, unit = TimeUnit.MILLISECONDS)
     public void testDelayTimerCountdown() {
         while (chip8.getV5() != 255) {
             chip8.cycle();
@@ -77,8 +82,9 @@ public class E05TimersTest {
      *
      * @throws java.io.IOException loading the program may throw an ioexception.
      */
-    @Ignore
-    @Test(timeout = 110000l)
+    @Disabled
+    @Test
+            @Timeout(value = 110000, unit = TimeUnit.MILLISECONDS)
     public void testEmitSoundTimer() throws IOException {
 
         Chip8 soundChip = Chip8Utils.createFromRom(getClass().getResource("/E05SoundLoop.ch8"));
