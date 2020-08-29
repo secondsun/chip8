@@ -29,11 +29,17 @@ public class JitInstrumentation {
     }
 
     public void hitInstruction(int memoryAddress) {
-        instrumentations.put(memoryAddress, new InstrumentationRecord(InstrumentationRecord.Type.INSTRUCTION, memoryAddress));
+        instrumentations.put(memoryAddress, new InstrumentationRecord(InstrumentationRecord.Type.INSTRUCTION, memoryAddress, vmAndRom.getInstruction(memoryAddress)));
     }
 
     public void hitSprite(int memoryAddress) {
-        instrumentations.put(memoryAddress, new InstrumentationRecord(InstrumentationRecord.Type.DATA, memoryAddress));
+        instrumentations.put(memoryAddress, new InstrumentationRecord(InstrumentationRecord.Type.DATA, memoryAddress, vmAndRom.getMemory()[memoryAddress]));
     }
 
+    @Override
+    public String toString() {
+        return "JitInstrumentation{" +
+                "\n\tinstrumentations=" + instrumentations +
+                "\n}";
+    }
 }

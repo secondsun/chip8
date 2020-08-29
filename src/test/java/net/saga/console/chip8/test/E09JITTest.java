@@ -55,6 +55,18 @@ public class E09JITTest {
             assertEquals(InstrumentationRecord.Type.DATA, spriteInstrumentation.getType());
         }
 
+        System.out.println(instrumentation);
+
+    }
+
+    /**
+     * BLocks of code should be tagged together. Blocks are the whole program, then split up into subroutines and also
+     * targets for jump instructions.
+     */
+    @Test
+    @DisplayName("Test tagging blocks")
+    public void categoryTest2() {
+        fail("not implemented");
     }
 
     /**
