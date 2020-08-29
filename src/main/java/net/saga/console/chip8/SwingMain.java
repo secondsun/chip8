@@ -34,8 +34,8 @@ import java.io.IOException;
 import static java.lang.Thread.sleep;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
+import javax.swing.*;
+
 import net.saga.console.chip8.util.Input;
 
 /**
@@ -74,6 +74,7 @@ public class SwingMain extends javax.swing.JFrame implements KeyListener {
             }
         });
         initComponents();
+
         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         manager.addKeyEventDispatcher(new KeyEventDispatcher() {
             @Override

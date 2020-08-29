@@ -25,6 +25,8 @@ package net.saga.console.chip8;
 
 import java.util.Arrays;
 import java.util.Random;
+
+import net.saga.console.chip8.jit.JitInstrumentation;
 import net.saga.console.chip8.util.Audio;
 import net.saga.console.chip8.util.Input;
 
@@ -44,6 +46,8 @@ public class Chip8 {
     private final byte[] memory;
     private byte[] video = new byte[64 * 32];
     private long nextTimer = 0;
+
+    private JitInstrumentation instrumentation = new JitInstrumentation(this);
 
     public Chip8() {
         this.memory = new byte[4096];
@@ -372,6 +376,7 @@ public class Chip8 {
                 for (int count = 0; (count < lines) ; count++) {
                     byte oldVideo = getSpriteRow(x, y + count);
                     writeVideo(x, y + count, memory[iRegister + count]);
+                    instrumentation.hitSprite(iRegister + count);
                     registers[0xF] = (((byte)memory[iRegister + count] & oldVideo)) == 0 ? ((byte)registers[0xF]) : 1;
                 }
 
@@ -385,12 +390,14 @@ public class Chip8 {
     }
 
     public void cycle() {
+        instrumentation.hitInstruction(pc);
         int instruction = ((memory[pc++] << 8) & 0xFF00) | (memory[pc++] & 0xFF);
         long time = System.currentTimeMillis();
         if (time > nextTimer) {
             countDownTimers();
             nextTimer = time + (1000 / 60);
         }
+
         execute(instruction);
     }
 
@@ -574,4 +581,12 @@ public class Chip8 {
         return sp;
     }
 
+    public JitInstrumentation getInstrumentation() {
+        return this.instrumentation;
+    }
+
+    public int getInstruction(int i) {
+        int instruction = ((memory[i] << 8) & 0xFF00) | (memory[i+1] & 0xFF);
+        return instruction;
+    }
 }
