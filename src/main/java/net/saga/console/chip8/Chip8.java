@@ -143,12 +143,14 @@ public class Chip8 {
 
         switch (high) {
             case 0x1000: {//1NNN Jump to NNN
+                instrumentation.scheduleIncrement();
                 int low = 0x0FFF & instruction;
                 pc = low;
 
             }
             break;
             case 0x2000: {//2NNN start subroutine at NNN
+                instrumentation.scheduleIncrement();
                 stack[sp] = pc;
                 sp++;
                 int low = 0x0FFF & instruction;
@@ -157,6 +159,7 @@ public class Chip8 {
             }
             break;
             case 0x3000: {//3XNN Skip if Vx = NN
+                instrumentation.scheduleIncrement();
                 int low = 0x0FF & instruction;
                 int register = (instruction & 0x0f00) >> 8;
                 if ((getVX(register)) == low) {
@@ -165,6 +168,7 @@ public class Chip8 {
             }
             break;
             case 0x5000: {//5XY0 Skip if Vx = Vy
+                instrumentation.scheduleIncrement();
                 int registery = (instruction & 0x00f0) >> 4;
                 int registerx = (instruction & 0x0f00) >> 8;
                 if (getVX(registerx) == getVX(registery)) {
@@ -173,6 +177,7 @@ public class Chip8 {
             }
             break;
             case 0x4000: {//$XNN Skip if Vx != NN
+                instrumentation.scheduleIncrement();
                 int low = 0x0FF & instruction;
                 int register = (instruction & 0x0f00) >> 8;
                 if (getVX(register) != low) {
@@ -181,6 +186,7 @@ public class Chip8 {
             }
             break;
             case 0x9000: {//9XY0 Skip if Vx != Vy
+                instrumentation.scheduleIncrement();
                 int registery = (instruction & 0x00f0) >> 4;
                 int registerx = (instruction & 0x0f00) >> 8;
                 if (getVX(registerx) != getVX(registery)) {
@@ -191,6 +197,7 @@ public class Chip8 {
             case 0x0000: {
                 switch (instruction) {
                     case 0x00EE:
+                        instrumentation.scheduleIncrement();
                         sp--;
                         pc = stack[sp];
                         break;
@@ -256,6 +263,7 @@ public class Chip8 {
             break;
 
             case 0xB000: {//BNNN Jump to NNN + V0
+                instrumentation.scheduleIncrement();
                 int low = 0x0FFF & instruction;
                 pc = low + getVX(0);
 
@@ -286,12 +294,14 @@ public class Chip8 {
                 switch (low) {
                     case 0x9E:
                         //skip if register == input
+                        instrumentation.scheduleIncrement();
                         if (getVX(register) == Input.read()) {
                             pc += 0x2;
                         }
                         break;
                     case 0xA1:
                         //skip if register != input
+                        instrumentation.scheduleIncrement();
                         if (getVX(register) != Input.read()) {
                             pc += 0x2;
                         }

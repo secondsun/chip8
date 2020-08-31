@@ -1,21 +1,39 @@
 package net.saga.console.chip8.jit;
 
-public class InstrumentationRecord {
+import java.util.EnumSet;
 
-    private final Type type;
+public class InstrumentationRecord implements Comparable<InstrumentationRecord> {
+
+    private final EnumSet<Flags> flags;
     private final int address;
-    private final int data;
+    private int blockId;
 
-    public enum Type  {INSTRUCTION, DATA};
-
-    public InstrumentationRecord(Type type, int address, int data) {
-        this.type = type;
-        this.address = address;
-        this.data = data;
+    public int getBlockId() {
+        return blockId;
     }
 
-    public Type getType() {
-        return type;
+    public InstrumentationRecord setBlockId(int blockId) {
+        this.blockId = blockId;
+        return this;
+    }
+
+    @Override
+    public int compareTo(InstrumentationRecord o) {
+        if (o.blockId == blockId) {
+            return address - o.address;
+        }
+        return blockId - o.blockId;
+    }
+
+    public enum Flags {HACK, INSTRUCTION, DATA};
+
+    public InstrumentationRecord(int address, Flags... initialFlags) {
+        this.address = address;
+        this.flags = EnumSet.of(Flags.HACK, initialFlags);
+    }
+
+    public EnumSet<Flags> getFlags() {
+        return EnumSet.copyOf(flags);
     }
 
     public int getAddress() {
@@ -25,9 +43,9 @@ public class InstrumentationRecord {
     @Override
     public String toString() {
         return "InstrumentationRecord{\n" +
-                "\t\ttype=" + type +
+                "\t\ttype=" + flags +
                 ", address=" + String.format("%05X", address) +
-                ", data=" + String.format("%05X", data) +
+                ", blockId=" + String.format("%d", blockId) +
                 "\n}";
     }
 }
