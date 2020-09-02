@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Create a jitting compiler.
+ * Create a jit .
  *
- * Heres some info
+ * Here's some info
  * My day of learning started here :
  * https://www.baeldung.com/graal-java-jit-compiler
  * Which lead to this video and blog post
@@ -116,20 +116,49 @@ public class E09JITTest {
         var afterJumpInstructionInstr = instrumentation.getInstrumentationAt(0x2b8);
 
         //There's an initialization block for the first 0xB8 bytes
-        assertEquals(1, firstInstructionInstr.getBlockId());
+        assertEquals(1, firstInstructionInstr.getBlock().getId());
 
         //Jump target creates a new block
-        assertEquals(2, afterJumpInstructionInstr.getBlockId());
+        assertEquals(2, afterJumpInstructionInstr.getBlock().getId());
 
-        fail("Need to add more tests and walk people through tagging blocks better");
         sortAndPrint(instrumentation, chip8);
+        //todo ("Need to add more tests and walk people through tagging blocks better");
+
 
     }
 
     @Test
     @DisplayName("Create Block Flow Paths")
-    public void createBlockFlow() {
-        fail("This tests that code blocks have entrances and exits");
+    public void createBlockFlow() throws IOException {
+
+        var chip8 = Chip8Utils.createFromRom(getClass().getResource("/Particle.ch8"));
+
+
+        //Give enough time for the instrumentation to run.
+        //Chip-8 has no "clock", but 10k instruction executions
+        //should hit everything in our simple program
+        for (int i = 0; i < 100000; i++) {
+            chip8.cycle();
+        }
+
+        var instrumentation = chip8.getInstrumentation();
+        var firstInstructionInstr = instrumentation.getInstrumentationAt(0x200);
+        var afterJumpInstructionInstr = instrumentation.getInstrumentationAt(0x2b8);
+
+        //There's an initialization block for the first 0xB8 bytes
+        assertEquals(2, firstInstructionInstr.getBlock().getExitsTo().get(0));
+
+        //Jump target creates a new block
+        assertEquals(1, afterJumpInstructionInstr.getBlock().getEnteredFrom().get(0));
+        assertEquals(3, afterJumpInstructionInstr.getBlock().getExitsTo().get(0));
+
+        var blocks = instrumentation.getBlocks();
+        blocks.forEach((block)->{
+            var enters = block.getEnteredFrom();
+            var exits = block.getExitsTo();
+            System.out.println(enters + "\t - \t" +block.getId() + "\t - \t" + exits);
+        });
+    fail("see above, blocks are dupliucating");
     }
 
     @Test
@@ -148,7 +177,7 @@ public class E09JITTest {
         var instructions = instrumentation.stream()
                 .filter(instruction -> instruction.getFlags().contains(InstrumentationRecord.Flags.INSTRUCTION))
                 .sorted()
-                .map(inst -> "block" + inst.getBlockId() + " - " + String.format("%4x", inst.getAddress()) + "@" + String.format("%4x", chip8.getInstruction(inst.getAddress())))
+                .map(inst -> "block" + inst.getBlock() + " - " + String.format("%4x", inst.getAddress()) + "@" + String.format("%4x", chip8.getInstruction(inst.getAddress())))
                 .reduce("", (s, s2) -> s + "\n" + s2);
 
         System.out.println(instructions);
