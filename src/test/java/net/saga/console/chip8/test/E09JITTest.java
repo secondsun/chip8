@@ -159,16 +159,16 @@ public class E09JITTest {
         blocks.forEach((block) -> {
 
             System.out.println("{");
-            System.out.println("id:" + block.getId());
-            System.out.println("instructions:[");
+            System.out.println("\"id\":" + block.getId());
+            System.out.println(",\"instructions\":[");
             System.out.println(String.join(",",
                     block.getInstructions().stream().map(instr -> {
-                            return String.format("0x%4x", chip8.getInstruction(instr.getAddress()));
+                            return String.format("\"0x%4x\"", chip8.getInstruction(instr.getAddress()));
                     }).collect(Collectors.toList())));
             System.out.println("],");
-            System.out.println("exits:");
+            System.out.println("\"exits\":");
             System.out.println(block.getExitsTo());
-            System.out.println(",");
+            System.out.println("");
             System.out.println("},");
         });
         System.out.println("]");
