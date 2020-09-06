@@ -146,7 +146,7 @@ public class Chip8 {
 
                 int low = 0x0FFF & instruction;
                 pc = low;
-                instrumentation.newBlockIfNeeded(pc);
+                instrumentation.recordJump(pc);
 
             }
             break;
@@ -155,7 +155,7 @@ public class Chip8 {
                 sp++;
                 int low = 0x0FFF & instruction;
                 pc = low;
-                instrumentation.newBlockIfNeeded(pc);
+                instrumentation.recordJump(pc);
 
             }
             break;
@@ -166,7 +166,7 @@ public class Chip8 {
                 if ((getVX(register)) == low) {
                     pc += 0x2;
                 }
-                instrumentation.newBlockIfNeeded(pc);
+                instrumentation.recordJump(pc);
             }
             break;
             case 0x5000: {//5XY0 Skip if Vx = Vy
@@ -175,7 +175,7 @@ public class Chip8 {
                 if (getVX(registerx) == getVX(registery)) {
                     pc += 0x2;
                 }
-                instrumentation.newBlockIfNeeded(pc);
+                instrumentation.recordJump(pc);
             }
             break;
             case 0x4000: {//$XNN Skip if Vx != NN
@@ -184,7 +184,7 @@ public class Chip8 {
                 if (getVX(register) != low) {
                     pc += 0x2;
                 }
-                instrumentation.newBlockIfNeeded(pc);
+                instrumentation.recordJump(pc);
             }
             break;
             case 0x9000: {//9XY0 Skip if Vx != Vy
@@ -193,7 +193,7 @@ public class Chip8 {
                 if (getVX(registerx) != getVX(registery)) {
                     pc += 0x2;
                 }
-                instrumentation.newBlockIfNeeded(pc);
+                instrumentation.recordJump(pc);
             }
             break;
             case 0x0000: {
@@ -201,7 +201,7 @@ public class Chip8 {
                     case 0x00EE:
                         sp--;
                         pc = stack[sp];
-                        instrumentation.newBlockIfNeeded(pc);
+                        instrumentation.recordJump(pc);
                         break;
                     case 0x00E0:
                         video = new byte[video.length];
@@ -268,7 +268,7 @@ public class Chip8 {
 
                 int low = 0x0FFF & instruction;
                 pc = low + getVX(0);
-                instrumentation.newBlockIfNeeded(pc);
+                instrumentation.recordJump(pc);
             }
             break;
             case 0x6000: {//6XNN	Store number NN in register VX
@@ -299,14 +299,14 @@ public class Chip8 {
                         if (getVX(register) == Input.read()) {
                             pc += 0x2;
                         }
-                        instrumentation.newBlockIfNeeded(pc);
+                        instrumentation.recordJump(pc);
                         break;
                     case 0xA1:
                         //skip if register != input
                         if (getVX(register) != Input.read()) {
                             pc += 0x2;
                         }
-                        instrumentation.newBlockIfNeeded(pc);
+                        instrumentation.recordJump(pc);
                         break;
                     default:
                         throw new UnsupportedOperationException("Unsupported opcode:" + Integer.toHexString(instruction));
@@ -388,7 +388,7 @@ public class Chip8 {
                 for (int count = 0; (count < lines) ; count++) {
                     byte oldVideo = getSpriteRow(x, y + count);
                     writeVideo(x, y + count, memory[iRegister + count]);
-                    instrumentation.hitSprite(iRegister + count);
+                    instrumentation.visitData(iRegister + count);
                     registers[0xF] = (((byte)memory[iRegister + count] & oldVideo)) == 0 ? ((byte)registers[0xF]) : 1;
                 }
 
@@ -402,7 +402,7 @@ public class Chip8 {
     }
 
     public void cycle() {
-        instrumentation.hitInstruction(pc);
+        instrumentation.visitInstruction(pc);
         int instruction = ((memory[pc++] << 8) & 0xFF00) | (memory[pc++] & 0xFF);
         long time = System.currentTimeMillis();
         if (time > nextTimer) {

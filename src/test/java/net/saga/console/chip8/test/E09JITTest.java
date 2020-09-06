@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Create a jit .
- *
+ * <p>
  * Here's some info
  * My day of learning started here :
  * https://www.baeldung.com/graal-java-jit-compiler
@@ -30,9 +30,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * https://www.zybuluo.com/SmashStack/note/847030
  * and finally
  * https://yurichev.com/mirrors/vanEmmerik_ssa.pdf
- *
+ * <p>
  * This is really a jitting decompiler than transforms into java bytecode
- *
  */
 public class E09JITTest {
 
@@ -153,12 +152,27 @@ public class E09JITTest {
         assertEquals(3, afterJumpInstructionInstr.getBlock().getExitsTo().get(0));
 
         var blocks = instrumentation.getBlocks();
-        blocks.forEach((block)->{
-            var enters = block.getEnteredFrom();
-            var exits = block.getExitsTo();
-            System.out.println(enters + "\t - \t" +block.getId() + "\t - \t" + exits);
+
+
+        System.out.println("[");
+
+        blocks.forEach((block) -> {
+
+            System.out.println("{");
+            System.out.println("id:" + block.getId());
+            System.out.println("instructions:[");
+            System.out.println(String.join(",",
+                    block.getInstructions().stream().map(instr -> {
+                            return String.format("0x%4x", chip8.getInstruction(instr.getAddress()));
+                    }).collect(Collectors.toList())));
+            System.out.println("],");
+            System.out.println("exits:");
+            System.out.println(block.getExitsTo());
+            System.out.println(",");
+            System.out.println("},");
         });
-    fail("see above, blocks are dupliucating");
+        System.out.println("]");
+        assertEquals(25, blocks.size());
     }
 
     @Test

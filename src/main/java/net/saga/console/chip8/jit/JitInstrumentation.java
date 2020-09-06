@@ -14,7 +14,8 @@ public class JitInstrumentation {
 
     private final Map<Integer, InstrumentationRecord> instrumentations = new HashMap<>();
     private final Chip8 vmAndRom;
-    private BasicBlock currentBlock = new BasicBlock(1);
+    private AtomicInteger blockCounter = new AtomicInteger(1);
+    private BasicBlock currentBlock = new BasicBlock(blockCounter.getAndIncrement());
     private final Set<BasicBlock> blocks = new HashSet<>();
 
     public JitInstrumentation(Chip8 chip8) {
@@ -32,7 +33,7 @@ public class JitInstrumentation {
         return instrumentations.get(memoryAddress);
     }
 
-    public void hitInstruction(int memoryAddress) {
+    public void visitInstruction(int memoryAddress) {
         instrumentations.computeIfAbsent(memoryAddress, (address) -> {
             var instr = new InstrumentationRecord(memoryAddress, currentBlock, InstrumentationRecord.Flags.INSTRUCTION);
             currentBlock.addInstruction(instr);
@@ -43,14 +44,18 @@ public class JitInstrumentation {
     /**
      * A jump in interpretation has occured and we need to update the current block to point out and into the new block
      *
-     * @param address memory addressof the instruction starting the new block. We don't create a block if one already exists
+     * @param jumpToAddress memory addressof the instruction starting the new block. We don't create a block if one already exists
      */
-    public void newBlockIfNeeded(int address) {
+    public void recordJump(int jumpToAddress) {
 
-        var newBlock = instrumentations.get(address)==null?null:instrumentations.get(address).getBlock();
+        var newBlock = instrumentations.get(jumpToAddress)==null?null:instrumentations.get(jumpToAddress).getBlock();
         if (newBlock == null) {
-            newBlock = new BasicBlock(currentBlock.getId() + 1);
-            blocks.add(currentBlock);
+            newBlock = new BasicBlock(blockCounter.getAndIncrement());
+            var maybe = blocks.stream().filter(block->block.getId() == blockCounter.get() - 1).findFirst();
+            if (maybe.isPresent()) {
+                throw new RuntimeException("Duplicate Blocks");
+            }
+            blocks.add(newBlock);
         }
         currentBlock.addExitsTo(newBlock.getId());
         newBlock.addEnteredFrom(currentBlock.getId());
@@ -58,7 +63,7 @@ public class JitInstrumentation {
 
     }
 
-    public void hitSprite(int memoryAddress) {
+    public void visitData(int memoryAddress) {
         instrumentations.computeIfAbsent(memoryAddress, (address) -> {
             return new InstrumentationRecord(memoryAddress, null, InstrumentationRecord.Flags.DATA);
         });
