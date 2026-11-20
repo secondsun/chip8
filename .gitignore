@@ -1,4 +1,9 @@
-target/**
+.gradle/
+build/
+**/build/
+target/
+.idea/
+*.iml
+.DS_Store
 nb-**
-**/keycloak.json
 /nbproject/

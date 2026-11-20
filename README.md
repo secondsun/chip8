@@ -1,56 +1,51 @@
-CHIP 8 by secondsun
-===================
+# CHIP-8 Studio
 
-A TDD Chip-8 implementation designed to teach how to write an "emulator" from scratch.
+A modernized, cross-platform **CHIP-8 / CHIP-48 / SUPER-CHIP / XO-CHIP / Mega-Chip** emulator built with **OpenJDK 27 (`--enable-preview`)**, **Gradle 9.9.2**, and **Compose Multiplatform Desktop (Material 3)**.
 
-[![You Tube Demo](https://img.youtube.com/vi/X8fVRDHrw18/0.jpg)](https://www.youtube.com/watch?v=X8fVRDHrw18)
+Originally started as a Java 8 / Maven / Swing TDD tutorial by `secondsun`, this branch (`feat/modern-refresh`) upgrades the entire stack to a multi-module architecture with a pure Java 27 emulator core and a responsive, Material You desktop UI.
 
-## Welcome
+## Highlights
 
-Chip-8 is a was created in the 1970s by Joseph Weisbecker to run games on the 8-bit computers of the day.  Chip-8 includes an assembly language, an interpreter, and the runtime.  There is a community around the platform which has created several games, and it has also expanded the platform to include newer features.  However, this project focuses on just the "vanilla" Chip-8 from the 1970s.
-
-This project focuses on implementing the Chip8 interpreter in a test driven manner.  You don't need any experience in writing emulators, but understanding Hexedecimal notation and binary operators are important.
-
-The master branch of this project is a stubbed out TDD project.  The [working](https://github.com/secondsun/chip8/tree/working) branch has my finished project.  
+- **Pure Java 27 Emulator Core (`:core`)**
+  - Uses finalized modern Java (`record`, `sealed interface`, pattern-matching `switch`, `HexFormat`, virtual threads, Java FFM API) alongside JDK 27 preview features:
+    - **JEP 531**: `LazyConstant` for font tables and the SHA-1 ROM metadata database
+    - **JEP 532**: Primitive types in patterns and guarded `switch`
+    - **JEP 533**: `StructuredTaskScope` for concurrent ROM library scanning
+- **Full CHIP-8 Family + Quirk Controls**
+  - **COSMAC VIP (1977)**, **CHIP-48 (1990)**, **SUPER-CHIP 1.0 / 1.1** (`128×64`, scrolling, `16×16` sprites, large font, RPL flags), **XO-CHIP** (`64 KB` RAM, 2-bitplane 4-color graphics, scroll-up, `F000 NNNN`, `5XY2`/`5XY3`, 16-byte programmable audio pattern buffer), and **Mega-Chip (2007)** (`256×192` double-buffered ARGB8 color, `16 MB` RAM, 24-bit `01NN NNNN`, 256-color palettes, alpha/additive/multiply blend modes, collision colors, and 8-bit digitized PCM audio streaming).
+  - Individual toggles for every hardware quirk (`vfReset`, `memoryIncrement`, `displayWait`, `clipping`, `shiftUsesVy`, `jumpUsesV0`, `waitForKeyRelease`, `loResTallSprites`) plus SHA-1 ROM auto-detection.
+- **Disgustingly Polished Compose Desktop UI (`:app`)**
+  - **Material You Dynamic Theming** via `MaterialKolor 6.0.0`, synced live to macOS tint / Windows accent / Linux XDG color scheme (with **System / Light / Dark / AMOLED** modes and custom/display-matched color seeds).
+  - **Adaptive Responsive Layout** across compact, medium, and widescreen windows, plus native drag-and-drop for `.ch8`, `.sc8`, `.xo8`, and `.mc8` ROMs.
+  - **CRT Display Suite**: Phosphor persistence (anti-flicker decay), optional scanlines, phosphor bloom/glow, pixel grid, and 10+ 4-color XO-CHIP palettes.
+  - **Synth Audio Engine**: Click-free 44.1 kHz synthesizer with Mute, Master Volume, 6 buzzer waveform presets (`Soft Sine`, `Classic Square`, `Warm Triangle`, `Retro Sawtooth`, `25% Chiptune Pulse`, `Filtered Chiptune`), configurable pitch, full XO-CHIP 16-byte pattern playback, and a live toolbar oscilloscope pill.
+  - **Keyboard & External Gamepad (LWJGL SDL3 + `input4j`)**: COSMAC 4×4 default layout (`1234 / QWER / ASDF / ZXCV`), built-in game presets, hot-plug USB/Bluetooth controller support across macOS/Windows/Linux, and an interactive visual 4×4 keypad + gamepad rebinding UI.
+  - **Power Features**: Auto-scanned ROM Library, Save States (8 slots with live pixel thumbnails), Hold-to-Rewind ring buffer (`Backspace`), Turbo 4× (`Tab`), and a collapsible Live Debugger (registers, breakpoints + disassembler, hex memory viewer, clickable 4×4 keypad).
 
 ## Prerequisites
 
-You need to have [Java 8](http://java.oracle.com) and [Maven](http://maven.apache.org) installed.  You can confirm it is working by running :
+- **OpenJDK 27** (configured as active JDK)
+
+## Running & Testing
 
 ```bash
-mvn clean install
+# Run all JUnit 6 tests (core + app)
+./gradlew check
+
+# Launch CHIP-8 Studio
+./gradlew :app:run
+
+# Build native platform installer (DMG on macOS, MSI on Windows, DEB on Linux)
+./gradlew :app:packageDistributionForCurrentOS
 ```
 
-You should maven attempt to run the project and fail because the tests do not pass.  Implementing these tests and thus Chip8 is part of th exercise.
+## Keyboard Shortcuts
 
-## Code overview
-
-Our tests are in the [test](src/test/java/net/saga/console/chip8/test) directory.  They are grouped into logical categories to to work through.  Feel free to add more tests if you don't feel comfortable with your code or want to see more how it works.
-
-There are a few helper classes for outputting audio, loading roms, displaying graphics, and handling input.  
-
-Finally, the [Chip8](src/main/java/net/saga/console/chip8/Chip8.java) class has a few parameters initialized but is otherwise empty.  This is the class file you will implement.
-
-## Let's Code
-
-The project is broken up into eight sections : 
- - 01 [Arithmetic](src/test/java/net/saga/console/chip8/test/E01ArithmeticOpCodeTest.java)
- - 02 [Bitwise operators](src/test/java/net/saga/console/chip8/test/E02BitwiseOpCodeTest.java)
- - 03 [Execution](src/test/java/net/saga/console/chip8/test/E03ClockExecutionAndMemoryTest.java)
- - 04 [Flow Control](src/test/java/net/saga/console/chip8/test/E04FlowControlTest.java)
- - 05 [Timers](src/test/java/net/saga/console/chip8/test/E05TimersTest.java)
- - 06 [Keypad Input](src/test/java/net/saga/console/chip8/test/E06KeypadInputTest.java)
- - 07 [Graphics](src/test/java/net/saga/console/chip8/test/E07GraphicsTest.java)
- - 08 [Utilities](src/test/java/net/saga/console/chip8/test/E08UtilitiesTest.java)
-
-Additionally you may want to review other documents on CHIP8 from the web.  My reference for writing this project was [Mastering CHIP-8 by Matthew Mikolay](http://mattmik.com/files/chip8/mastering/chip8.html) and the [CHIP-8 Wikipedia article](https://en.wikipedia.org/wiki/CHIP-8).
-
-# Exec
-
-When you are finished you can run Chip8 in a Swing window
-
-```bash
-mvn exec:java  -Dexec.mainClass="net.saga.console.chip8.SwingMain"
-```
-
-Find some roms online and run them in your emulator.
+| Shortcut | Action |
+| --- | --- |
+| `1234 / QWER / ASDF / ZXCV` | Default COSMAC 4×4 Hex Keypad |
+| `F5` / `F6` / `F8` | Play/Pause • Step Instruction • Reset |
+| `Tab` (hold) / `Backspace` (hold) | Turbo 4× • Live Rewind |
+| `F1`–`F4` / `Shift + F1`–`F4` | Quick Save / Quick Load (Slots 1–4) |
+| `Cmd/Ctrl + L` / `Cmd/Ctrl + D` | Toggle ROM Library / Toggle Live Debugger |
+| `Cmd/Ctrl + M` / `Cmd/Ctrl + ,` | Mute Audio / Open Settings |
